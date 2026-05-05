@@ -14,8 +14,8 @@ const CreditBureauAuthView: React.FC = () => {
       <section className="mb-8">
         <p>En cumplimiento de la Ley 1266 de 2008 (Ley de Habeas Data Financiero) y demás normas concordantes, autorizo de manera previa, expresa e informada a:</p>
         <div className="mt-3 p-4 bg-gray-50 rounded-xl">
-          <p><strong>VEQTO S.A.S.</strong> — NIT: 901.XXX.XXX-X</p>
-          <p className="text-sm text-gray-600 mt-1">y a las entidades financieras aliadas a las que se envíe mi solicitud de crédito vehicular</p>
+          <p><strong>VEQTO S.A.S.</strong> — NIT: 902.051.244-0</p>
+          <p className="text-sm text-gray-600 mt-1">y a las entidades financieras aliadas a las que se envíe mi solicitud de cualquiera de los productos financieros que comercializa Veqto</p>
         </div>
       </section>
 
@@ -36,7 +36,7 @@ const CreditBureauAuthView: React.FC = () => {
             <strong>Verificar</strong> la autenticidad de la información personal y financiera que he proporcionado en la solicitud de crédito.
           </li>
           <li>
-            <strong>Compartir</strong> los resultados de las consultas crediticias con las entidades financieras aliadas que evalúen mi solicitud de crédito vehicular.
+            <strong>Compartir</strong> los resultados de las consultas crediticias con las entidades financieras aliadas que evalúen mi solicitud del producto financiero seleccionado (crédito vehículo, leasing, prenda, compra de cartera, libranza o libre inversión).
           </li>
           <li>
             <strong>Consultar</strong> las listas restrictivas nacionales e internacionales (OFAC, ONU, entre otras) para el cumplimiento de las normas de prevención de lavado de activos y financiación del terrorismo.
@@ -73,7 +73,7 @@ const CreditBureauAuthView: React.FC = () => {
         <h2 className="text-lg font-bold mb-3">Vigencia de la Autorización</h2>
         <p>La presente autorización tendrá vigencia desde la fecha de su otorgamiento y se mantendrá vigente mientras:</p>
         <ul className="list-disc pl-5 space-y-1 mt-2">
-          <li>Se encuentre en trámite mi solicitud de crédito vehicular</li>
+          <li>Se encuentre en trámite mi solicitud de cualquiera de los productos financieros que comercializa Veqto</li>
           <li>Existan obligaciones financieras vigentes derivadas del crédito aprobado</li>
           <li>Subsista la finalidad del tratamiento de la información</li>
           <li>No sea revocada expresamente por el titular</li>

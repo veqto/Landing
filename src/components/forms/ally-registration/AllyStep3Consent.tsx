@@ -25,9 +25,9 @@ const AllyStep3Consent: React.FC<Props> = ({ data, errors, onChange }) => {
           <ConsentCheckbox
             checked={data.autorizaDatos}
             onChange={(v) => onChange({ autorizaDatos: v })}
-            label="Autorizo a VEQTO S.A.S. el tratamiento de los datos personales y comerciales de mi establecimiento conforme a la Ley 1581 de 2012 y su política de privacidad."
-            linkText="Ver Política de Privacidad"
-            linkHref="/politica-privacidad"
+            label="Autorizo a VEQTO S.A.S. el tratamiento de los datos personales y comerciales de mi establecimiento conforme a la Ley 1581 de 2012 y su Política de Tratamiento de Datos."
+            linkText="Ver Política de Tratamiento de Datos"
+            linkHref="/politica-tratamiento-datos"
             error={errors.autorizaDatos}
             required
           />

@@ -29,8 +29,8 @@ const TermsView: React.FC = () => {
     >
       <section id="objeto" className="mb-8">
         <h2 className="text-lg font-bold mb-3">1. Objeto</h2>
-        <p>Los presentes Términos y Condiciones regulan el acceso y uso de la plataforma digital Veqto (www.veqto.com), operada por VEQTO S.A.S., sociedad comercial constituida conforme a las leyes de la República de Colombia, con domicilio en Bogotá D.C.</p>
-        <p className="mt-2">Veqto es una plataforma tecnológica que actúa como orquestador de crédito vehicular, conectando a personas naturales interesadas en financiamiento vehicular con entidades financieras autorizadas y vigiladas por la Superintendencia Financiera de Colombia, a través de una red de aliados comerciales (concesionarios y compraventas).</p>
+        <p>Los presentes Términos y Condiciones regulan el acceso y uso de la plataforma digital Veqto (www.veqto.ai), operada por VEQTO S.A.S., sociedad comercial constituida conforme a las leyes de la República de Colombia, con domicilio en Bogotá D.C.</p>
+        <p className="mt-2">Veqto es una plataforma tecnológica que actúa como orquestador de productos financieros (crédito vehículo, leasing vehículo, prenda sobre garantía propia, compra de cartera vehicular, libranza y libre inversión), conectando a personas naturales y jurídicas con entidades financieras autorizadas y vigiladas por la Superintendencia Financiera de Colombia, a través de una red de aliados comerciales y concesionarios.</p>
       </section>
 
       <section id="capacidad" className="mb-8">
@@ -57,7 +57,7 @@ const TermsView: React.FC = () => {
 
       <section id="proceso-credito" className="mb-8">
         <h2 className="text-lg font-bold mb-3">4. Proceso de Crédito Vehicular</h2>
-        <p>El proceso de solicitud de crédito vehicular a través de Veqto comprende las siguientes etapas:</p>
+        <p>El proceso de solicitud de cualquiera de los productos financieros que comercializa Veqto comprende las siguientes etapas:</p>
         <ol className="list-decimal pl-5 space-y-1 mt-2">
           <li><strong>Solicitud:</strong> El usuario completa el formulario de solicitud con sus datos personales, financieros y del vehículo de interés.</li>
           <li><strong>Evaluación preliminar:</strong> Veqto realiza un análisis preliminar del perfil crediticio del solicitante.</li>
@@ -121,7 +121,7 @@ const TermsView: React.FC = () => {
       <section id="conflictos" className="mb-8">
         <h2 className="text-lg font-bold mb-3">10. Resolución de Conflictos</h2>
         <p>Cualquier controversia derivada de los presentes Términos será resuelta en primera instancia mediante negociación directa entre las partes. En caso de no llegar a un acuerdo, las partes se someterán a la jurisdicción de los jueces y tribunales de Bogotá D.C., Colombia.</p>
-        <p className="mt-2">Para quejas o reclamaciones, el usuario puede contactar a Veqto a través del correo electrónico soporte@veqto.com o la línea de atención +57 (601) 601-2345.</p>
+        <p className="mt-2">Para quejas o reclamaciones, el usuario puede contactar a Veqto a través del correo electrónico <strong>protecciondatos@veqto.ai</strong>.</p>
       </section>
 
       <section id="modificaciones" className="mb-8">

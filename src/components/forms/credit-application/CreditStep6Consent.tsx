@@ -27,9 +27,9 @@ const CreditStep6Consent: React.FC<Props> = ({ data, errors, onChange }) => {
           <ConsentCheckbox
             checked={data.autorizaDatos}
             onChange={(v) => onChange({ autorizaDatos: v })}
-            label="Autorizo a VEQTO S.A.S. el tratamiento de mis datos personales conforme a la Ley 1581 de 2012 y su política de privacidad, para las finalidades relacionadas con la solicitud de crédito vehicular."
-            linkText="Ver Política de Privacidad"
-            linkHref="/politica-privacidad"
+            label="Autorizo a VEQTO S.A.S. el tratamiento de mis datos personales conforme a la Ley 1581 de 2012 y su Política de Tratamiento de Datos, para las finalidades relacionadas con la solicitud de los productos financieros que comercializa Veqto."
+            linkText="Ver Política de Tratamiento de Datos"
+            linkHref="/politica-tratamiento-datos"
             error={errors.autorizaDatos}
             required
           />
@@ -78,9 +78,9 @@ const CreditStep6Consent: React.FC<Props> = ({ data, errors, onChange }) => {
           <ConsentCheckbox
             checked={data.aceptaPoliticaPrivacidad}
             onChange={(v) => onChange({ aceptaPoliticaPrivacidad: v })}
-            label="He leído y acepto la Política de Privacidad y Protección de Datos Personales de Veqto conforme a la Ley 1581 de 2012."
-            linkText="Ver Política de Privacidad"
-            linkHref="/politica-privacidad"
+            label="He leído y acepto la Política de Tratamiento y Protección de Datos Personales de Veqto conforme a la Ley 1581 de 2012."
+            linkText="Ver Política de Tratamiento de Datos"
+            linkHref="/politica-tratamiento-datos"
             error={errors.aceptaPoliticaPrivacidad}
             required
           />

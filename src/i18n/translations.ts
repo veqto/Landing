@@ -302,7 +302,7 @@ export const translations: Record<Locale, Translations> = {
       legal: "Legal",
       legalLinks: [
         { label: "Términos y Condiciones", href: "/terminos-condiciones" },
-        { label: "Política de Privacidad", href: "/politica-privacidad" },
+        { label: "Política de Tratamiento de Datos", href: "/politica-tratamiento-datos" },
         { label: "Autorización de Datos", href: "/autorizacion-datos" },
       ],
       contact: "Contacto",
@@ -522,7 +522,7 @@ export const translations: Record<Locale, Translations> = {
       legal: "Legal",
       legalLinks: [
         { label: "Terms & Conditions", href: "/terminos-condiciones" },
-        { label: "Privacy Policy", href: "/politica-privacidad" },
+        { label: "Data Processing Policy", href: "/politica-tratamiento-datos" },
         { label: "Data Authorization", href: "/autorizacion-datos" },
       ],
       contact: "Contact",
