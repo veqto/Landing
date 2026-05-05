@@ -28,6 +28,7 @@ export type Translations = {
   };
   creditFlow: {
     title: string;
+    subtitle?: string;
     steps: {
       [key: string]: {
         title: string;
@@ -379,52 +380,23 @@ export const translations: Record<Locale, Translations> = {
       ],
     },
     creditFlow: {
-      title: "Veqto Credit Flow",
+      title: "How does it work?",
+      subtitle: "This is how we help you move forward",
       steps: {
         "1": {
-          title: "Customer Arrival",
+          title: "We understand your profile",
           description:
-            "The customer arrives at the allied dealership and selects the vehicle they want to finance.",
+            "Not all banks lend the same way. We analyze your case before showing options.",
         },
         "2": {
-          title: "Credit Simulation",
+          title: "We sort the best alternatives",
           description:
-            "Simulate credit conditions in seconds with our smart calculator.",
+            "We make banks compete and translate the credit into clear language.",
         },
         "3": {
-          title: "AI Scoring",
+          title: "We accompany you to decide well",
           description:
-            "Our artificial intelligence engine evaluates the credit profile instantly.",
-        },
-        "4": {
-          title: "Multi-Bank Routing",
-          description:
-            "The application is sent simultaneously to multiple banks to maximize approval.",
-        },
-        "5": {
-          title: "Approval",
-          description:
-            "Receive approved offers from different banks and choose the best one for you.",
-        },
-        "6": {
-          title: "Notification",
-          description:
-            "All parties receive real-time notifications of the credit status.",
-        },
-        "7": {
-          title: "Disbursement",
-          description:
-            "The bank disburses directly to the dealer securely and quickly.",
-        },
-        "8": {
-          title: "Embedded Insurance",
-          description:
-            "Vehicle insurance integrated into the process to protect your investment from day one.",
-        },
-        "9": {
-          title: "Partner Commission",
-          description:
-            "The dealer receives their commission automatically, without additional paperwork.",
+            "You don't sign blindly nor waste time. You move forward confidently.",
         },
       },
     },
