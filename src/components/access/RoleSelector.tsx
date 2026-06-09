@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { Wrench, Handshake, Landmark, ChevronRight } from 'lucide-react';
 import { useTranslation } from '@/i18n/LanguageContext';
 import Container from '@/components/ui/Container';
 import { cn } from '@/lib/utils';
@@ -65,7 +66,7 @@ const RoleSelector: React.FC = () => {
             animate="visible"
           >
             <RoleCard
-              icon={admin.icon}
+              Icon={Wrench}
               title={admin.title}
               description={admin.description}
               actionLabel={admin.button}
@@ -81,7 +82,7 @@ const RoleSelector: React.FC = () => {
             animate="visible"
           >
             <RoleCard
-              icon={ally.icon}
+              Icon={Handshake}
               title={ally.title}
               description={ally.description}
               actionLabel={ally.button}
@@ -97,7 +98,7 @@ const RoleSelector: React.FC = () => {
             animate="visible"
           >
             <RoleCard
-              icon={bank.icon}
+              Icon={Landmark}
               title={bank.title}
               description={bank.description}
               actionLabel={bank.button}
@@ -137,7 +138,7 @@ const RoleSelector: React.FC = () => {
 };
 
 interface RoleCardProps {
-  icon: string;
+  Icon: React.ElementType;
   title: string;
   description: string;
   actionLabel: string;
@@ -147,7 +148,7 @@ interface RoleCardProps {
 }
 
 const RoleCard: React.FC<RoleCardProps> = ({
-  icon,
+  Icon,
   title,
   description,
   actionLabel,
@@ -169,12 +170,15 @@ const RoleCard: React.FC<RoleCardProps> = ({
       {/* Icon */}
       <div
         className={cn(
-          'flex items-center justify-center w-16 h-16 rounded-2xl mb-5 text-3xl',
-          disabled ? 'bg-gray-100' : 'bg-aurora-light'
+          'flex items-center justify-center w-20 h-20 rounded-2xl mb-5',
+          disabled ? 'bg-gray-100 text-gray-400' : 'bg-aurora/10 text-aurora'
         )}
         aria-hidden="true"
       >
-        {icon}
+        <Icon
+          className={cn('w-10 h-10', disabled && 'opacity-60')}
+          strokeWidth={1.5}
+        />
       </div>
 
       <h2 className="text-xl font-bold text-negro mb-2">{title}</h2>
@@ -210,12 +214,13 @@ const RoleCard: React.FC<RoleCardProps> = ({
         <a
           href={href}
           className={cn(
-            'w-full inline-flex items-center justify-center px-6 py-3 rounded-full',
+            'group/btn w-full inline-flex items-center justify-center px-6 py-3 rounded-full',
             'font-semibold text-sm bg-[#00C4A0] text-white',
             'transition-all duration-300 hover:shadow-lg hover:shadow-[#00C4A0]/50'
           )}
         >
           {actionLabel}
+          <ChevronRight className="w-4 h-4 ml-1 transition-transform duration-300 group-hover/btn:translate-x-0.5" />
         </a>
       )}
     </div>
