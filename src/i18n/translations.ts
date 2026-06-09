@@ -75,6 +75,19 @@ export type Translations = {
     button2: string;
     trustBadge: string;
   };
+  access: {
+    navButton: string;
+    pageTitle: string;
+    pageSubtitle: string;
+    roles: {
+      admin: { icon: string; title: string; description: string; button: string };
+      ally: { icon: string; title: string; description: string; button: string };
+      bank: { icon: string; title: string; description: string; button: string; tooltip: string };
+    };
+    helpNote: string;
+    contactLabel: string;
+    backHome: string;
+  };
   footer: {
     company: string;
     companyDescription: string;
@@ -278,6 +291,35 @@ export const translations: Record<Locale, Translations> = {
       button2: "Ser Aliado Comercial",
       trustBadge:
         "La plataforma de crédito vehicular más innovadora de Colombia",
+    },
+    access: {
+      navButton: "Acceder a la plataforma",
+      pageTitle: "¿Cómo querés ingresar?",
+      pageSubtitle: "Seleccioná tu rol para continuar",
+      roles: {
+        admin: {
+          icon: "🛠️",
+          title: "Administrador",
+          description: "Gestión de solicitudes, aliados y bancos",
+          button: "Ingresar con email y contraseña",
+        },
+        ally: {
+          icon: "🤝",
+          title: "Aliado",
+          description: "Concesionarios y referidores que capturan clientes",
+          button: "Ingresar con cédula",
+        },
+        bank: {
+          icon: "🏦",
+          title: "Banco (asesor)",
+          description: "Asesores de entidades bancarias aliadas",
+          button: "Próximamente disponible",
+          tooltip: "Disponible muy pronto — estamos finalizando el módulo",
+        },
+      },
+      helpNote: "¿Sos aliado y no tenés acceso? Contactá a tu asesor F&I de Veqto",
+      contactLabel: "Escribinos a",
+      backHome: "Volver al inicio",
     },
     footer: {
       company: "Veqto",
@@ -498,6 +540,35 @@ export const translations: Record<Locale, Translations> = {
       button2: "Become a Partner",
       trustBadge:
         "Colombia's most innovative vehicle credit platform",
+    },
+    access: {
+      navButton: "Access the platform",
+      pageTitle: "How would you like to sign in?",
+      pageSubtitle: "Select your role to continue",
+      roles: {
+        admin: {
+          icon: "🛠️",
+          title: "Administrator",
+          description: "Manage applications, partners and banks",
+          button: "Sign in with email and password",
+        },
+        ally: {
+          icon: "🤝",
+          title: "Partner",
+          description: "Dealerships and referrers who capture clients",
+          button: "Sign in with ID number",
+        },
+        bank: {
+          icon: "🏦",
+          title: "Bank (advisor)",
+          description: "Advisors from partner banking institutions",
+          button: "Coming soon",
+          tooltip: "Available very soon — we're finalizing the module",
+        },
+      },
+      helpNote: "Are you a partner without access? Contact your Veqto F&I advisor",
+      contactLabel: "Email us at",
+      backHome: "Back to home",
     },
     footer: {
       company: "Veqto",

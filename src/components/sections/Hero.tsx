@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useTranslation } from "@/i18n/LanguageContext";
 import { useModal } from "@/components/ModalContext";
 import Button from "@/components/ui/Button";
+import AccessButton from "@/components/ui/AccessButton";
 
 const emptySubscribe = () => () => {};
 
@@ -157,26 +158,34 @@ const Hero = () => {
 
           {/* CTA Buttons */}
           <motion.div
-            className="flex flex-col sm:flex-row gap-4 sm:gap-6 pt-2 sm:pt-4"
+            className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 sm:gap-6 pt-2 sm:pt-4"
             initial="hidden"
             animate={isVisible ? "visible" : "hidden"}
           >
             <motion.div custom={0} variants={buttonVariants}>
-              <Button
-                variant="primary"
+              <AccessButton
+                label={t.access.navButton}
                 size="lg"
                 className="w-full sm:w-auto px-8 sm:px-10 text-base sm:text-lg font-semibold"
-                onClick={openCreditModal}
-              >
-                {t.hero.cta1}
-              </Button>
+              />
             </motion.div>
 
             <motion.div custom={1} variants={buttonVariants}>
               <Button
                 variant="secondary"
                 size="lg"
-                className="w-full sm:w-auto px-8 sm:px-10 text-base sm:text-lg font-semibold"
+                className="w-full sm:w-auto px-8 sm:px-10 text-base sm:text-lg font-semibold border-white text-white hover:bg-white hover:text-negro"
+                onClick={openCreditModal}
+              >
+                {t.hero.cta1}
+              </Button>
+            </motion.div>
+
+            <motion.div custom={2} variants={buttonVariants}>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="w-full sm:w-auto px-8 sm:px-10 text-base sm:text-lg font-semibold border-white/60 text-white/90 hover:bg-white hover:text-negro"
                 onClick={openAllyModal}
               >
                 {t.hero.cta2}

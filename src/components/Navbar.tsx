@@ -7,6 +7,7 @@ import { useTranslation } from "@/i18n/LanguageContext";
 import { useModal } from "@/components/ModalContext";
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 import Button from "@/components/ui/Button";
+import AccessButton from "@/components/ui/AccessButton";
 import { cn } from "@/lib/utils";
 
 interface NavLink {
@@ -153,14 +154,20 @@ const Navbar: React.FC = () => {
             </div>
 
             <Button
-              variant="primary"
+              variant="secondary"
               size="sm"
-              className="hidden sm:inline-flex text-xs sm:text-sm"
+              className="hidden lg:inline-flex text-xs sm:text-sm border-white/70 text-white hover:bg-white hover:text-negro"
               aria-label={t.navbar.cta}
               onClick={openCreditModal}
             >
               {t.navbar.cta}
             </Button>
+
+            <AccessButton
+              label={t.access.navButton}
+              size="sm"
+              className="hidden sm:inline-flex text-xs sm:text-sm"
+            />
 
             {/* Mobile Menu Toggle */}
             <motion.button
@@ -219,16 +226,24 @@ const Navbar: React.FC = () => {
                   </motion.a>
                 ))}
 
-                <div className="border-t border-white/10 my-2 pt-3 flex gap-2 items-center justify-between">
-                  <LanguageSwitcher />
-                  <Button
-                    variant="primary"
+                <div className="border-t border-white/10 my-2 pt-3 flex flex-col gap-3">
+                  <AccessButton
+                    label={t.access.navButton}
                     size="sm"
-                    className="flex-1 text-xs"
-                    onClick={() => { setIsMenuOpen(false); openCreditModal(); }}
-                  >
-                    {t.navbar.cta}
-                  </Button>
+                    className="w-full text-sm"
+                    onClick={() => setIsMenuOpen(false)}
+                  />
+                  <div className="flex gap-2 items-center justify-between">
+                    <LanguageSwitcher />
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="flex-1 text-xs border-white/70 text-white hover:bg-white hover:text-negro"
+                      onClick={() => { setIsMenuOpen(false); openCreditModal(); }}
+                    >
+                      {t.navbar.cta}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </motion.div>
