@@ -80,9 +80,9 @@ export type Translations = {
     pageTitle: string;
     pageSubtitle: string;
     roles: {
-      admin: { icon: string; title: string; description: string; button: string };
-      ally: { icon: string; title: string; description: string; button: string };
-      bank: { icon: string; title: string; description: string; button: string; tooltip: string };
+      admin: { title: string; description: string; button: string };
+      ally: { title: string; description: string; button: string };
+      bank: { title: string; description: string; button: string };
     };
     helpNote: string;
     contactLabel: string;
@@ -298,23 +298,19 @@ export const translations: Record<Locale, Translations> = {
       pageSubtitle: "Seleccioná tu rol para continuar",
       roles: {
         admin: {
-          icon: "🛠️",
           title: "Administrador",
           description: "Gestión de solicitudes, aliados y bancos",
           button: "Ingresar con email y contraseña",
         },
         ally: {
-          icon: "🤝",
           title: "Aliado",
           description: "Concesionarios y referidores que capturan clientes",
           button: "Ingresar con cédula",
         },
         bank: {
-          icon: "🏦",
           title: "Banco (asesor)",
           description: "Asesores de entidades bancarias aliadas",
-          button: "Próximamente disponible",
-          tooltip: "Disponible muy pronto — estamos finalizando el módulo",
+          button: "Ingresar con email",
         },
       },
       helpNote: "¿Sos aliado y no tenés acceso? Contactá a tu asesor F&I de Veqto",
@@ -547,23 +543,19 @@ export const translations: Record<Locale, Translations> = {
       pageSubtitle: "Select your role to continue",
       roles: {
         admin: {
-          icon: "🛠️",
           title: "Administrator",
           description: "Manage applications, partners and banks",
           button: "Sign in with email and password",
         },
         ally: {
-          icon: "🤝",
           title: "Partner",
           description: "Dealerships and referrers who capture clients",
           button: "Sign in with ID number",
         },
         bank: {
-          icon: "🏦",
           title: "Bank (advisor)",
           description: "Advisors from partner banking institutions",
-          button: "Coming soon",
-          tooltip: "Available very soon — we're finalizing the module",
+          button: "Login with email",
         },
       },
       helpNote: "Are you a partner without access? Contact your Veqto F&I advisor",
