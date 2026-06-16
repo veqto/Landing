@@ -4,9 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter, usePathname } from "next/navigation";
 import { useTranslation } from "@/i18n/LanguageContext";
-import { useModal } from "@/components/ModalContext";
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
-import Button from "@/components/ui/Button";
 import AccessButton from "@/components/ui/AccessButton";
 import { cn } from "@/lib/utils";
 
@@ -19,9 +17,13 @@ const Navbar: React.FC = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
-  const { openCreditModal } = useModal();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // En rutas no-home (acceder, legales, etc.) el body es bg-cream → el navbar
+  // necesita fondo sólido desde el inicio para que el logo y los links sean legibles.
+  const isHome = pathname === "/";
+  const hasSolidBg = isScrolled || !isHome;
 
   const navLinks: NavLink[] = [
     { label: t.navbar.home, href: "#inicio" },
@@ -29,7 +31,6 @@ const Navbar: React.FC = () => {
     { label: t.navbar.creditFlow, href: "#proceso" },
     { label: t.navbar.benefits, href: "#beneficios" },
     { label: t.navbar.simulator, href: "#simulador" },
-    { label: t.navbar.cta, href: "#contacto" },
   ];
 
   useEffect(() => {
@@ -104,8 +105,8 @@ const Navbar: React.FC = () => {
       variants={navbarVariants}
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isScrolled
-          ? "bg-negro/80 backdrop-blur-md border-b border-white/10 shadow-lg"
+        hasSolidBg
+          ? "bg-negro/90 backdrop-blur-md border-b border-white/10 shadow-lg"
           : "bg-transparent"
       )}
       role="navigation"
@@ -147,21 +148,12 @@ const Navbar: React.FC = () => {
             ))}
           </div>
 
-          {/* Right Side */}
+          {/* Right Side — CTA "Solicitar Crédito" se removió del navbar para evitar
+              duplicación con el CTA primario del Hero (1 mensaje / 1 botón). */}
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="hidden sm:block">
               <LanguageSwitcher />
             </div>
-
-            <Button
-              variant="secondary"
-              size="sm"
-              className="hidden lg:inline-flex text-xs sm:text-sm border-white/70 text-white hover:bg-white hover:text-negro"
-              aria-label={t.navbar.cta}
-              onClick={openCreditModal}
-            >
-              {t.navbar.cta}
-            </Button>
 
             <AccessButton
               label={t.access.navButton}
@@ -233,17 +225,7 @@ const Navbar: React.FC = () => {
                     className="w-full text-sm"
                     onClick={() => setIsMenuOpen(false)}
                   />
-                  <div className="flex gap-2 items-center justify-between">
-                    <LanguageSwitcher />
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="flex-1 text-xs border-white/70 text-white hover:bg-white hover:text-negro"
-                      onClick={() => { setIsMenuOpen(false); openCreditModal(); }}
-                    >
-                      {t.navbar.cta}
-                    </Button>
-                  </div>
+                  <LanguageSwitcher />
                 </div>
               </div>
             </motion.div>
