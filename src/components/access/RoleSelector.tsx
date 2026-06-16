@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 const PLATFORM_LINKS = {
   admin: 'https://app.veqto.ai/admin/login',
   ally: 'https://app.veqto.ai/aliado/login',
-  // bank: disponible en Sprint 15 → https://app.veqto.ai/banco/login
+  bank: 'https://app.veqto.ai/banco/login',
 } as const;
 
 const CONTACT_EMAIL = 'info@veqto.ai';
@@ -90,7 +90,7 @@ const RoleSelector: React.FC = () => {
             />
           </motion.div>
 
-          {/* Card 3 — Banco aliado (disabled) */}
+          {/* Card 3 — Banco (asesor) */}
           <motion.div
             custom={2}
             variants={cardVariants}
@@ -102,8 +102,7 @@ const RoleSelector: React.FC = () => {
               title={bank.title}
               description={bank.description}
               actionLabel={bank.button}
-              tooltip={bank.tooltip}
-              disabled
+              href={PLATFORM_LINKS.bank}
             />
           </motion.div>
         </div>
@@ -142,9 +141,7 @@ interface RoleCardProps {
   title: string;
   description: string;
   actionLabel: string;
-  href?: string;
-  tooltip?: string;
-  disabled?: boolean;
+  href: string;
 }
 
 const RoleCard: React.FC<RoleCardProps> = ({
@@ -153,8 +150,6 @@ const RoleCard: React.FC<RoleCardProps> = ({
   description,
   actionLabel,
   href,
-  tooltip,
-  disabled = false,
 }) => {
   return (
     <div
@@ -162,23 +157,15 @@ const RoleCard: React.FC<RoleCardProps> = ({
         'group h-full flex flex-col items-center text-center',
         'bg-white rounded-2xl border border-gray-100 shadow-lg p-8',
         'transition-all duration-300',
-        disabled
-          ? 'opacity-70'
-          : 'hover:-translate-y-1 hover:shadow-xl hover:border-aurora/40'
+        'hover:-translate-y-1 hover:shadow-xl hover:border-aurora/40'
       )}
     >
       {/* Icon */}
       <div
-        className={cn(
-          'flex items-center justify-center w-20 h-20 rounded-2xl mb-5',
-          disabled ? 'bg-gray-100 text-gray-400' : 'bg-aurora/10 text-aurora'
-        )}
+        className="flex items-center justify-center w-20 h-20 rounded-2xl mb-5 bg-aurora/10 text-aurora"
         aria-hidden="true"
       >
-        <Icon
-          className={cn('w-10 h-10', disabled && 'opacity-60')}
-          strokeWidth={1.5}
-        />
+        <Icon className="w-10 h-10" strokeWidth={1.5} />
       </div>
 
       <h2 className="text-xl font-bold text-negro mb-2">{title}</h2>
@@ -186,43 +173,17 @@ const RoleCard: React.FC<RoleCardProps> = ({
         {description}
       </p>
 
-      {disabled ? (
-        <div className="relative w-full">
-          <button
-            type="button"
-            disabled
-            aria-disabled="true"
-            title={tooltip}
-            className="w-full px-6 py-3 rounded-full font-semibold text-sm bg-gray-100 text-gray-400 cursor-not-allowed"
-          >
-            {actionLabel}
-          </button>
-          {tooltip && (
-            <span
-              role="tooltip"
-              className={cn(
-                'pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56',
-                'rounded-lg bg-negro text-white text-xs px-3 py-2 shadow-lg',
-                'opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20'
-              )}
-            >
-              {tooltip}
-            </span>
-          )}
-        </div>
-      ) : (
-        <a
-          href={href}
-          className={cn(
-            'group/btn w-full inline-flex items-center justify-center px-6 py-3 rounded-full',
-            'font-semibold text-sm bg-[#00C4A0] text-white',
-            'transition-all duration-300 hover:shadow-lg hover:shadow-[#00C4A0]/50'
-          )}
-        >
-          {actionLabel}
-          <ChevronRight className="w-4 h-4 ml-1 transition-transform duration-300 group-hover/btn:translate-x-0.5" />
-        </a>
-      )}
+      <a
+        href={href}
+        className={cn(
+          'group/btn w-full inline-flex items-center justify-center px-6 py-3 rounded-full',
+          'font-semibold text-sm bg-[#00C4A0] text-white',
+          'transition-all duration-300 hover:shadow-lg hover:shadow-[#00C4A0]/50'
+        )}
+      >
+        {actionLabel}
+        <ChevronRight className="w-4 h-4 ml-1 transition-transform duration-300 group-hover/btn:translate-x-0.5" />
+      </a>
     </div>
   );
 };
