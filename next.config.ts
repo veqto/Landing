@@ -3,7 +3,7 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
-    remotePatterns: [{ protocol: 'https', hostname: '**.veqto.co' }],
+    remotePatterns: [{ protocol: 'https', hostname: '**.veqto.ai' }],
   },
   async headers() {
     return [{
