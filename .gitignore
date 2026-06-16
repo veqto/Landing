@@ -9,3 +9,12 @@ node_modules/
 dist/
 build/
 .turbo/
+
+# Build artifacts
+next-env.d.ts
+tsconfig.tsbuildinfo
+tscheck.json
+tscheck.tsbuildinfo
+
+# Local agent config
+.claude/

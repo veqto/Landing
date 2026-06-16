@@ -13,7 +13,13 @@ export type Translations = {
     title: string;
     highlightWords: string[];
     subtitle: string;
+    /** CTA principal del Hero (scroll a simulador). Reemplaza cta1+cta2 del v1. */
+    ctaPrimary: string;
+    /** Link discreto debajo del CTA principal (abre AllyModal). */
+    ctaAllySecondary: string;
+    /** @deprecated kept for backwards compat in older sections; usar ctaPrimary */
     cta1: string;
+    /** @deprecated kept for backwards compat in older sections; usar ctaAllySecondary */
     cta2: string;
     tagline: string;
     scrollText: string;
@@ -130,6 +136,8 @@ export const translations: Record<Locale, Translations> = {
       highlightWords: ["Crédito", "Vehicular", "Inteligente"],
       subtitle:
         "Conectamos clientes, concesionarios y bancos para financiar tu próximo vehículo de forma rápida, segura y transparente en Colombia.",
+      ctaPrimary: "Simular mi crédito",
+      ctaAllySecondary: "Soy aliado comercial",
       cta1: "Solicitar Crédito",
       cta2: "Soy Aliado Comercial",
       tagline: "Crédito vehicular inteligente para Colombia",
@@ -375,6 +383,8 @@ export const translations: Record<Locale, Translations> = {
       highlightWords: ["Smart", "Vehicle", "Credit"],
       subtitle:
         "We connect customers, dealers and banks to finance your next vehicle quickly, securely and transparently in Colombia.",
+      ctaPrimary: "Simulate my credit",
+      ctaAllySecondary: "I'm a commercial partner",
       cta1: "Apply for Credit",
       cta2: "I'm a Commercial Partner",
       tagline: "Smart vehicle financing for Colombia",
