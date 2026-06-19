@@ -201,12 +201,12 @@ const Footer: React.FC = () => {
                 <li className="flex items-start gap-3">
                   <Globe size={16} className="text-aurora mt-1 flex-shrink-0" aria-hidden="true" />
                   <a
-                    href="https://www.veqto.co"
+                    href="https://www.veqto.ai"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-gray-400 hover:text-aurora transition-colors duration-300 text-sm"
                   >
-                    www.veqto.co
+                    www.veqto.ai
                   </a>
                 </li>
               </ul>
