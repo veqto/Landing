@@ -24,16 +24,13 @@ export type Translations = {
   hero: {
     titleSegments: TitleSegment[];
     subtitle: string;
-    /** CTA principal del Hero (scroll a simulador). Reemplaza cta1+cta2 del v1. */
+    /** Párrafo de apoyo; el segmento resaltado se renderiza en negrita, no en verde. */
+    intro: TitleSegment[];
+    /** CTA naranja de conversión: abre CreditRequestModal. */
     ctaPrimary: string;
-    /** Link discreto debajo del CTA principal (abre AllyModal). */
-    ctaAllySecondary: string;
-    /** @deprecated kept for backwards compat in older sections; usar ctaPrimary */
-    cta1: string;
-    /** @deprecated kept for backwards compat in older sections; usar ctaAllySecondary */
-    cta2: string;
-    tagline: string;
-    scrollText: string;
+    /** CTA outline claro: hace scroll a la sección de pasos (#proceso). */
+    ctaSecondary: string;
+    imageAlt: string;
   };
   whatIs: {
     title: string;
@@ -143,15 +140,19 @@ export const translations: Record<Locale, Translations> = {
       cta: "Solicitar Crédito",
     },
     hero: {
-      titleSegments: [{ text: "Crédito Vehicular Inteligente", highlight: true }],
+      titleSegments: [{ text: "EL CRÉDITO VEHICULAR, SIN VUELTAS" }],
       subtitle:
-        "Conectamos clientes, concesionarios y bancos para financiar tu próximo vehículo de forma rápida, segura y transparente en Colombia.",
-      ctaPrimary: "Simular mi crédito",
-      ctaAllySecondary: "Soy aliado comercial",
-      cta1: "Solicitar Crédito",
-      cta2: "Soy Aliado Comercial",
-      tagline: "Crédito vehicular inteligente para Colombia",
-      scrollText: "Descubre más",
+        "Compara, elige y obtén la mejor financiación para tu vehículo desde un solo lugar.",
+      intro: [
+        { text: "Veqto conecta", highlight: true },
+        {
+          text: " clientes, concesionarios y entidades financieras para hacer que el proceso de crédito sea transparente, rápido y sin fricciones.",
+        },
+      ],
+      ctaPrimary: "Solicitar Financiación",
+      ctaSecondary: "Conocer cómo funciona",
+      imageAlt:
+        "Cliente junto a su vehículo con el estudio de crédito Veqto aprobado",
     },
     whatIs: {
       title: "¿Qué es Veqto?",
@@ -389,15 +390,19 @@ export const translations: Record<Locale, Translations> = {
       cta: "Apply for Credit",
     },
     hero: {
-      titleSegments: [{ text: "Smart Vehicle Credit", highlight: true }],
+      titleSegments: [{ text: "CAR FINANCING, NO RUNAROUND" }],
       subtitle:
-        "We connect customers, dealers and banks to finance your next vehicle quickly, securely and transparently in Colombia.",
-      ctaPrimary: "Simulate my credit",
-      ctaAllySecondary: "I'm a commercial partner",
-      cta1: "Apply for Credit",
-      cta2: "I'm a Commercial Partner",
-      tagline: "Smart vehicle financing for Colombia",
-      scrollText: "Discover more",
+        "Compare, choose and get the best financing for your vehicle, all in one place.",
+      intro: [
+        { text: "Veqto connects", highlight: true },
+        {
+          text: " customers, dealerships and financial institutions to make the credit process transparent, fast and frictionless.",
+        },
+      ],
+      ctaPrimary: "Request Financing",
+      ctaSecondary: "See how it works",
+      imageAlt:
+        "Customer next to their vehicle with an approved Veqto credit assessment",
     },
     whatIs: {
       title: "What is Veqto?",

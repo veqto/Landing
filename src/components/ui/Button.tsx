@@ -14,6 +14,12 @@ const buttonVariants = cva(
           'bg-[#00C4A0] text-white hover:shadow-lg hover:shadow-[#00C4A0]/50',
         secondary:
           'border-2 border-[#00C4A0] text-[#00C4A0] hover:bg-[#00C4A0] hover:text-white',
+        /* CTA primario de conversión del diseño aprobado: naranja con texto oscuro. */
+        naranja:
+          'bg-naranja text-negro hover:bg-naranja-dark hover:shadow-lg hover:shadow-naranja/40',
+        /* CTA secundario sobre fondos oscuros. */
+        outlineLight:
+          'border-2 border-white text-white hover:bg-white hover:text-negro',
         ghost:
           'text-[#0A0F1E] hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800',
       },
