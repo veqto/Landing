@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useRouter, usePathname } from "next/navigation";
 import { useTranslation } from "@/i18n/LanguageContext";
 import { useModal } from "@/components/ModalContext";
@@ -21,6 +21,7 @@ const Navbar: React.FC = () => {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const reduced = useReducedMotion() ?? false;
 
   // En rutas no-home (acceder, legales, etc.) el body es bg-cream → el navbar
   // necesita fondo sólido desde el inicio para que el logo y los links sean legibles.
@@ -65,8 +66,9 @@ const Navbar: React.FC = () => {
     }
   };
 
+  // Con reduced-motion todo entra por opacidad, sin desplazamiento ni cascada.
   const navbarVariants = {
-    hidden: { opacity: 0, y: -20 },
+    hidden: reduced ? { opacity: 0 } : { opacity: 0, y: -20 },
     visible: {
       opacity: 1,
       y: 0,
@@ -75,26 +77,24 @@ const Navbar: React.FC = () => {
   };
 
   const menuVariants = {
-    hidden: { opacity: 0, y: -20 },
+    hidden: reduced ? { opacity: 0 } : { opacity: 0, y: -20 },
     visible: {
       opacity: 1,
       y: 0,
       transition: { duration: 0.3 },
     },
-    exit: {
-      opacity: 0,
-      y: -20,
-      transition: { duration: 0.3 },
-    },
+    exit: reduced
+      ? { opacity: 0, transition: { duration: 0.2 } }
+      : { opacity: 0, y: -20, transition: { duration: 0.3 } },
   };
 
   const linkVariants = {
-    hidden: { opacity: 0, x: -10 },
+    hidden: reduced ? { opacity: 0 } : { opacity: 0, x: -10 },
     visible: (i: number) => ({
       opacity: 1,
       x: 0,
       transition: {
-        delay: i * 0.05,
+        delay: reduced ? 0 : i * 0.05,
         duration: 0.3,
       },
     }),
@@ -120,8 +120,8 @@ const Navbar: React.FC = () => {
           <motion.a
             href="#inicio"
             onClick={(e) => handleSmoothScroll(e, "#inicio")}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={reduced ? undefined : { scale: 1.05 }}
+            whileTap={reduced ? undefined : { scale: 0.95 }}
             className="flex items-center cursor-pointer"
             aria-label="Veqto - Ir al inicio"
           >
@@ -159,8 +159,8 @@ const Navbar: React.FC = () => {
 
             <motion.button
               onClick={openCreditModal}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={reduced ? undefined : { scale: 1.05 }}
+              whileTap={reduced ? undefined : { scale: 0.98 }}
               className="hidden lg:inline-flex items-center justify-center rounded-full border-2 border-white/70 px-4 py-2 text-xs sm:text-sm font-semibold text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-negro"
             >
               {t.navbar.cta}
@@ -176,8 +176,8 @@ const Navbar: React.FC = () => {
             <motion.button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={reduced ? undefined : { scale: 1.1 }}
+              whileTap={reduced ? undefined : { scale: 0.95 }}
               aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
               aria-expanded={isMenuOpen}
               aria-controls="mobile-menu"

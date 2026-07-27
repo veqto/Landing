@@ -20,11 +20,14 @@ import { useTranslation } from '@/i18n/LanguageContext';
 import { useModal } from '@/components/ModalContext';
 import Container from '@/components/ui/Container';
 import SectionHeading from '@/components/ui/SectionHeading';
-import { staggerContainer, fadeInUp, viewportConfig } from '@/lib/animations';
+import { useReveal, REVEAL_VIEWPORT } from '@/hooks/useReveal';
 
 const Ecosystem: React.FC = () => {
   const { t } = useTranslation();
   const { openAllyModal } = useModal();
+  const { reduced, isDesktop, container, item } = useReveal();
+
+  const cardHover = reduced || !isDesktop ? undefined : { scale: 1.02 };
 
   const [dealers, allies, banks] = t.ecosystem.cards;
 
@@ -41,22 +44,32 @@ const Ecosystem: React.FC = () => {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={viewportConfig}
-          variants={staggerContainer}
+          viewport={REVEAL_VIEWPORT}
+          variants={container()}
           className="grid gap-6 lg:grid-cols-2"
         >
           {/* Concesionarios: foto con degradado verde */}
           <motion.article
-            variants={fadeInUp}
-            className="group relative min-h-[22rem] overflow-hidden rounded-3xl lg:row-span-2 lg:min-h-[30rem]"
+            variants={item()}
+            whileHover={cardHover}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="relative min-h-[22rem] overflow-hidden rounded-3xl shadow-lg shadow-negro/5 transition-shadow duration-300 hover:shadow-2xl hover:shadow-negro/20 lg:row-span-2 lg:min-h-[30rem]"
           >
-            <Image
-              src="/images/landing/ecosistema-concesionario.jpg"
-              alt={t.ecosystem.imageAlt}
-              fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-            />
+            {/* Ken Burns: zoom lentísimo en loop sobre la foto, no sobre la
+                tarjeta, para que el degradado y el texto no se muevan. */}
+            <motion.div
+              className="absolute inset-0 will-change-transform"
+              animate={reduced ? undefined : { scale: [1, 1.06, 1] }}
+              transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <Image
+                src="/images/landing/ecosistema-concesionario.jpg"
+                alt={t.ecosystem.imageAlt}
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
+            </motion.div>
             <div
               className="absolute inset-0 bg-gradient-to-t from-aurora via-aurora/70 to-transparent"
               aria-hidden="true"
@@ -73,8 +86,10 @@ const Ecosystem: React.FC = () => {
 
           {/* Aliados comerciales: verde sólido + entrada al modal de registro */}
           <motion.article
-            variants={fadeInUp}
-            className="flex items-start justify-between gap-6 rounded-3xl bg-aurora p-6 md:p-8"
+            variants={item()}
+            whileHover={cardHover}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="flex items-start justify-between gap-6 rounded-3xl bg-aurora p-6 shadow-lg shadow-negro/5 transition-shadow duration-300 hover:shadow-2xl hover:shadow-aurora/30 md:p-8"
           >
             <div>
               <h3 className="text-xl font-bold text-white md:text-2xl">
@@ -98,8 +113,10 @@ const Ecosystem: React.FC = () => {
 
           {/* Entidades financieras: oscura sólida */}
           <motion.article
-            variants={fadeInUp}
-            className="flex items-start justify-between gap-6 rounded-3xl bg-negro p-6 md:p-8"
+            variants={item()}
+            whileHover={cardHover}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="flex items-start justify-between gap-6 rounded-3xl bg-negro p-6 shadow-lg shadow-negro/10 transition-shadow duration-300 hover:shadow-2xl hover:shadow-negro/30 md:p-8"
           >
             <div>
               <h3 className="text-xl font-bold text-white md:text-2xl">

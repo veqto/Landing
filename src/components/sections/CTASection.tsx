@@ -15,11 +15,12 @@ import { useModal } from '@/components/ModalContext';
 import Container from '@/components/ui/Container';
 import Button from '@/components/ui/Button';
 import MeshFloor from '@/components/ui/MeshFloor';
-import { staggerContainer, fadeInUp, viewportConfig } from '@/lib/animations';
+import { useReveal, REVEAL_VIEWPORT } from '@/hooks/useReveal';
 
 const CTASection: React.FC = () => {
   const { t } = useTranslation();
   const { openCreditModal } = useModal();
+  const { reduced, container, item } = useReveal();
 
   return (
     <section
@@ -37,34 +38,48 @@ const CTASection: React.FC = () => {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={viewportConfig}
-          variants={staggerContainer}
+          viewport={REVEAL_VIEWPORT}
+          variants={container()}
           className="mx-auto flex max-w-3xl flex-col items-center text-center"
         >
           <motion.span
-            variants={fadeInUp}
+            variants={item()}
             className="mb-8 block h-1 w-20 rounded-full bg-aurora"
             aria-hidden="true"
           />
 
           <motion.h2
-            variants={fadeInUp}
+            variants={item()}
             className="text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl"
           >
             {t.cta.title}
           </motion.h2>
 
           <motion.p
-            variants={fadeInUp}
+            variants={item()}
             className="mt-6 text-base leading-relaxed text-gray-400 sm:text-lg"
           >
             {t.cta.subtitle}
           </motion.p>
 
-          <motion.div variants={fadeInUp} className="mt-10 w-full sm:w-auto">
+          <motion.div variants={item()} className="relative mt-10 w-full sm:w-auto">
+            {/* El "pulso de sombra" es un halo naranja desenfocado detrás del
+                botón: anima opacity y scale en vez de box-shadow, así no
+                repinta la sombra en cada frame. */}
+            <motion.span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-naranja/50 blur-xl will-change-transform"
+              animate={
+                reduced
+                  ? undefined
+                  : { opacity: [0.3, 0.7, 0.3], scale: [0.96, 1.08, 0.96] }
+              }
+              transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+            />
             <Button
               variant="naranja"
               size="lg"
+              shine
               className="w-full px-10 text-base sm:w-auto"
               onClick={openCreditModal}
             >

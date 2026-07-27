@@ -62,6 +62,21 @@
   }
 }
 
+/* Trazado de íconos de línea. Los SVG de lucide no exponen sus paths como
+   componentes de motion, así que el "pathLength 0->1" se resuelve con
+   stroke-dashoffset. `both` aplica el estado inicial al arrancar, de modo que
+   el ícono se ve normal hasta que la clase entra. */
+@keyframes draw-stroke {
+  from {
+    stroke-dasharray: 120;
+    stroke-dashoffset: 120;
+  }
+  to {
+    stroke-dasharray: 120;
+    stroke-dashoffset: 0;
+  }
+}
+
 @keyframes pulse-glow {
   0%,
   100% {
@@ -110,6 +125,16 @@
     box-shadow: 0 2px 10px rgba(0, 196, 160, 0.4);
   }
 
+  /* Feedback al arrastrar: el thumb nativo solo es estilable desde CSS. */
+  input[type="range"]:active::-webkit-slider-thumb {
+    transform: scale(1.3);
+    box-shadow: 0 2px 14px rgba(0, 196, 160, 0.55);
+  }
+
+  input[type="range"]:active::-moz-range-thumb {
+    transform: scale(1.3);
+  }
+
   input[type="range"]::-moz-range-thumb {
     width: 24px;
     height: 24px;
@@ -124,6 +149,20 @@
   *:focus-visible {
     outline: 2px solid #00c4a0;
     outline-offset: 2px;
+  }
+
+  /* Red de seguridad para lo que anima desde CSS (halo del hero, marquee,
+     trazado de íconos). Las animaciones de framer-motion se apagan por su
+     cuenta vía useReducedMotion en el hook useReveal. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
@@ -146,6 +185,12 @@
      Se combina con utilidades de posición y `rotate-*` para elegir la esquina. */
   .corner-fold {
     clip-path: polygon(100% 0, 0 0, 100% 100%);
+  }
+
+  /* Se aplica solo al entrar en viewport (ver DrawnIcon): sin la clase el
+     ícono se renderiza completo, así que degrada bien sin JS. */
+  .draw-icon-run > svg * {
+    animation: draw-stroke 0.9s ease-out both;
   }
 
   /* GPU-accelerated animation hints */

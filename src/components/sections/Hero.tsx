@@ -19,19 +19,16 @@ import { useModal } from "@/components/ModalContext";
 import Button from "@/components/ui/Button";
 import HighlightedText from "@/components/ui/HighlightedText";
 import MeshFloor from "@/components/ui/MeshFloor";
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (delay: number = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay, duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
-  }),
-};
+import { useReveal } from "@/hooks/useReveal";
 
 const Hero: React.FC = () => {
   const { t } = useTranslation();
   const { openCreditModal } = useModal();
+  const { reduced, container, item } = useReveal();
+
+  // Cascada de entrada: título -> subtítulo -> separador -> párrafo -> CTAs.
+  const cascade = container(0.12);
+  const line = item('up');
 
   const handleScrollToSteps = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -60,40 +57,30 @@ const Hero: React.FC = () => {
 
       <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-10 px-4 pb-16 pt-28 sm:px-6 sm:pb-20 sm:pt-32 lg:grid-cols-[45fr_55fr] lg:gap-6 lg:px-8 lg:pb-28">
         {/* Columna izquierda: texto + CTAs */}
-        <div className="flex flex-col items-start text-left">
+        <motion.div
+          variants={cascade}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col items-start text-left"
+        >
           <motion.h1
-            variants={fadeUp}
-            custom={0}
-            initial="hidden"
-            animate="visible"
+            variants={line}
             className="text-4xl font-extrabold uppercase leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl"
           >
             <HighlightedText segments={t.hero.titleSegments} />
           </motion.h1>
 
           <motion.p
-            variants={fadeUp}
-            custom={0.12}
-            initial="hidden"
-            animate="visible"
+            variants={line}
             className="mt-6 max-w-xl text-base leading-relaxed text-gray-300 sm:text-lg"
           >
             {t.hero.subtitle}
           </motion.p>
 
-          <motion.div
-            variants={fadeUp}
-            custom={0.2}
-            initial="hidden"
-            animate="visible"
-            className="my-7 h-px w-24 bg-aurora/60"
-          />
+          <motion.div variants={line} className="my-7 h-px w-24 bg-aurora/60" />
 
           <motion.p
-            variants={fadeUp}
-            custom={0.28}
-            initial="hidden"
-            animate="visible"
+            variants={line}
             className="max-w-xl text-sm leading-relaxed text-gray-400 sm:text-base"
           >
             <HighlightedText
@@ -103,15 +90,13 @@ const Hero: React.FC = () => {
           </motion.p>
 
           <motion.div
-            variants={fadeUp}
-            custom={0.4}
-            initial="hidden"
-            animate="visible"
+            variants={line}
             className="mt-9 flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center"
           >
             <Button
               variant="naranja"
               size="lg"
+              shine
               className="w-full px-8 text-base sm:w-auto"
               onClick={openCreditModal}
             >
@@ -127,19 +112,19 @@ const Hero: React.FC = () => {
               {t.hero.ctaSecondary}
             </Button>
           </motion.div>
-        </div>
+        </motion.div>
 
         {/* Columna derecha: foto. Flota suavemente para dar vida a la
             tarjeta "Estudio de crédito 720" que trae la propia imagen. */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.94 }}
+          initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.25, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           className="flex justify-center lg:justify-end"
         >
           <motion.div
-            animate={{ y: [0, -12, 0] }}
-            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            animate={reduced ? undefined : { y: [0, -8, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             className="w-full max-w-lg will-change-transform lg:max-w-2xl"
           >
             <Image

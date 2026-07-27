@@ -3,6 +3,7 @@
 import { LanguageProvider } from '@/i18n/LanguageContext';
 import { ModalProvider } from '@/components/ModalContext';
 import Navbar from '@/components/Navbar';
+import ScrollProgress from '@/components/ui/ScrollProgress';
 import Hero from '@/components/sections/Hero';
 import Problem from '@/components/sections/Problem';
 import Solution from '@/components/sections/Solution';
@@ -20,6 +21,7 @@ export default function Home() {
   return (
     <LanguageProvider>
       <ModalProvider>
+        <ScrollProgress />
         <Navbar />
         <main>
           <Hero />

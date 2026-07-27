@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useId } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface MeshFloorProps {
@@ -55,6 +56,7 @@ const MeshFloor: React.FC<MeshFloorProps> = ({ className }) => {
   // El componente se monta dos veces (hero y CTA final): el id del gradiente
   // debe ser único o el segundo SVG referenciaría el <defs> del primero.
   const gradientId = useId();
+  const reduced = useReducedMotion() ?? false;
 
   return (
     <svg
@@ -72,11 +74,16 @@ const MeshFloor: React.FC<MeshFloorProps> = ({ className }) => {
         </linearGradient>
       </defs>
 
-      <g
+      {/* La ondulación es un desplazamiento vertical del grupo completo: un
+          único transform compuesto en GPU, en vez de reanimar las geometrías. */}
+      <motion.g
         stroke={`url(#${gradientId})`}
         fill="none"
         strokeWidth="1"
         vectorEffect="non-scaling-stroke"
+        animate={reduced ? undefined : { y: [0, 7, 0] }}
+        transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
+        className="will-change-transform"
       >
         {Array.from({ length: COLS + 1 }, (_, col) => (
           <path key={`v-${col}`} d={verticalPath(col)} />
@@ -84,7 +91,7 @@ const MeshFloor: React.FC<MeshFloorProps> = ({ className }) => {
         {Array.from({ length: ROWS + 1 }, (_, row) => (
           <path key={`h-${row}`} d={horizontalPath(row)} />
         ))}
-      </g>
+      </motion.g>
     </svg>
   );
 };

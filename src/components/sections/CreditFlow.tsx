@@ -14,7 +14,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from '@/i18n/LanguageContext';
 import Container from '@/components/ui/Container';
 import SectionHeading from '@/components/ui/SectionHeading';
-import { staggerContainer, fadeInUp, viewportConfig } from '@/lib/animations';
+import { useReveal, REVEAL_VIEWPORT } from '@/hooks/useReveal';
 
 /** Arco verde/blanco que enmarca la foto en desktop. Decorativo. */
 const DecorativeArc: React.FC = () => (
@@ -45,6 +45,12 @@ const DecorativeArc: React.FC = () => (
 
 const CreditFlow: React.FC = () => {
   const { t } = useTranslation();
+  const { container, item, pop, hoverLift } = useReveal();
+
+  // 150ms entre pasos: los círculos se "encienden" en orden 1-2-3-4.
+  const stepsContainer = container(0.15);
+  const stepItem = item('up');
+  const circlePop = pop();
 
   const steps = Object.keys(t.creditFlow.steps).map((key) => ({
     number: key,
@@ -66,10 +72,10 @@ const CreditFlow: React.FC = () => {
         <div className="grid items-center gap-12 lg:grid-cols-[35fr_65fr] lg:gap-10">
           {/* Foto + arco decorativo */}
           <motion.div
-            initial={{ opacity: 0, x: -24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={viewportConfig}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            variants={item('left')}
+            initial="hidden"
+            whileInView="visible"
+            viewport={REVEAL_VIEWPORT}
             className="relative flex justify-center lg:justify-start"
           >
             <DecorativeArc />
@@ -87,19 +93,23 @@ const CreditFlow: React.FC = () => {
           <motion.ol
             initial="hidden"
             whileInView="visible"
-            viewport={viewportConfig}
-            variants={staggerContainer}
+            viewport={REVEAL_VIEWPORT}
+            variants={stepsContainer}
             className="grid gap-6 sm:grid-cols-2 sm:gap-8"
           >
             {steps.map((step) => (
               <motion.li
                 key={step.number}
-                variants={fadeInUp}
+                variants={stepItem}
+                whileHover={hoverLift(4)}
                 className="group flex gap-4"
               >
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-lg font-bold text-aurora shadow-lg shadow-aurora/20 transition-transform duration-300 group-hover:scale-110">
+                <motion.span
+                  variants={circlePop}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-lg font-bold text-aurora shadow-lg shadow-aurora/20 will-change-transform"
+                >
                   {step.number}
-                </span>
+                </motion.span>
                 <div>
                   <h3 className="text-base font-bold text-white md:text-lg">
                     {step.title}

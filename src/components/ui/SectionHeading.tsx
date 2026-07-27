@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { TitleSegment } from '@/i18n/translations';
 import HighlightedText from '@/components/ui/HighlightedText';
+import { useReveal, REVEAL_VIEWPORT } from '@/hooks/useReveal';
 
 interface SectionHeadingProps {
   /** Texto plano, o segmentos cuando el titular lleva resaltado parcial. */
@@ -30,28 +31,8 @@ const SectionHeading: React.FC<SectionHeadingProps> = ({
   const segments: TitleSegment[] =
     typeof title === 'string' ? [{ text: title }] : title;
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        
-      },
-    },
-  };
+  const { container, item } = useReveal();
+  const itemVariants = item('up');
 
   return (
     <motion.div
@@ -60,10 +41,10 @@ const SectionHeading: React.FC<SectionHeadingProps> = ({
         centered && 'items-center',
         className
       )}
-      variants={containerVariants}
+      variants={container(0.12)}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: '0px 0px -100px 0px' }}
+      viewport={REVEAL_VIEWPORT}
     >
       {/* Accent line */}
       {accent && (

@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useMemo, useEffect } from 'react';
+import { motion, animate, useMotionValue, useTransform } from 'framer-motion';
 import { useTranslation } from '@/i18n/LanguageContext';
+import { useReveal, REVEAL_VIEWPORT } from '@/hooks/useReveal';
 import { useModal } from '@/components/ModalContext';
 import Container from '@/components/ui/Container';
 import SectionHeading from '@/components/ui/SectionHeading';
@@ -70,6 +71,26 @@ const Simulator: React.FC = () => {
     setShowResult(true);
   };
 
+  // Count-up de la cuota mensual. El MotionValue se formatea en cada frame y
+  // se pinta como hijo de un motion.p, así que React no re-renderiza durante
+  // la animación. El <p> es de ancho completo: el número al crecer no empuja
+  // a ningún hermano.
+  const { reduced, item } = useReveal();
+  const revealItem = item('up');
+  const paymentValue = useMotionValue(0);
+  const paymentLabel = useTransform(paymentValue, (value) => formatCOP(value));
+
+  useEffect(() => {
+    if (!showResult) return;
+
+    const controls = animate(paymentValue, estimatedPayment, {
+      duration: reduced ? 0 : 0.8,
+      ease: 'easeOut',
+    });
+
+    return () => controls.stop();
+  }, [showResult, estimatedPayment, paymentValue, reduced]);
+
   const termOptions = [12, 24, 36, 48, 60, 72];
 
   return (
@@ -84,10 +105,10 @@ const Simulator: React.FC = () => {
 
         {/* Simulator Card */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true, margin: '0px 0px -100px 0px' }}
+          variants={revealItem}
+          initial="hidden"
+          whileInView="visible"
+          viewport={REVEAL_VIEWPORT}
           className="max-w-2xl mx-auto"
         >
           <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-200">
@@ -247,9 +268,13 @@ const Simulator: React.FC = () => {
             {/* Result Display */}
             {showResult && (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
+                initial={reduced ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={
+                  reduced
+                    ? { duration: 0.3 }
+                    : { type: 'spring', stiffness: 260, damping: 22, mass: 0.7 }
+                }
                 className="bg-gradient-to-br from-aurora/10 to-aurora/5 rounded-2xl p-6 border border-aurora/30"
               >
                 <div className="space-y-4">
@@ -285,12 +310,10 @@ const Simulator: React.FC = () => {
                       {t.simulator.monthlyPayment}
                     </p>
                     <motion.p
-                      key={estimatedPayment}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="text-3xl font-bold text-aurora"
+                      className="text-3xl font-bold text-aurora tabular-nums"
+                      aria-label={`${t.simulator.monthlyPayment}: ${formatCOP(estimatedPayment)}`}
                     >
-                      {formatCOP(estimatedPayment)}
+                      {paymentLabel}
                     </motion.p>
                     <p className="text-xs text-gray-500 mt-1">
                       {term} {t.simulator.monthsLabel} &middot; {monthlyRate.toFixed(2)}% n.m.v. ({annualRate.toFixed(2)}% E.A.)
@@ -314,10 +337,10 @@ const Simulator: React.FC = () => {
 
         {/* CTA Below */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true, margin: '0px 0px -100px 0px' }}
+          variants={revealItem}
+          initial="hidden"
+          whileInView="visible"
+          viewport={REVEAL_VIEWPORT}
           className="text-center mt-12"
         >
           <Button
