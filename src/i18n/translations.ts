@@ -47,6 +47,10 @@ export type Translations = {
     }>;
     imageAlt: string;
   };
+  whyVeqto: {
+    titleSegments: TitleSegment[];
+    items: string[];
+  };
   creditFlow: {
     title: string;
     subtitle?: string;
@@ -199,6 +203,19 @@ export const translations: Record<Locale, Translations> = {
       ],
       imageAlt:
         "Persona consultando el avance de su solicitud de crédito en la app de Veqto",
+    },
+    whyVeqto: {
+      titleSegments: [
+        { text: "¿Por qué elegir " },
+        { text: "Veqto", highlight: true },
+        { text: "?" },
+      ],
+      items: [
+        "Más opciones de financiación",
+        "Un proceso más rápido",
+        "Transparencia en cada paso",
+        "Todo en un solo lugar",
+      ],
     },
     creditFlow: {
       title: "¿Cómo funciona?",
@@ -455,6 +472,19 @@ export const translations: Record<Locale, Translations> = {
       ],
       imageAlt:
         "Person checking the progress of their credit application in the Veqto app",
+    },
+    whyVeqto: {
+      titleSegments: [
+        { text: "Why choose " },
+        { text: "Veqto", highlight: true },
+        { text: "?" },
+      ],
+      items: [
+        "More financing options",
+        "A faster process",
+        "Transparency at every step",
+        "Everything in one place",
+      ],
     },
     creditFlow: {
       title: "How does it work?",

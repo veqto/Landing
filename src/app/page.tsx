@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar';
 import Hero from '@/components/sections/Hero';
 import Problem from '@/components/sections/Problem';
 import Solution from '@/components/sections/Solution';
+import WhyVeqto from '@/components/sections/WhyVeqto';
 import CreditFlow from '@/components/sections/CreditFlow';
 import BenefitsAllies from '@/components/sections/BenefitsAllies';
 import BenefitsBanks from '@/components/sections/BenefitsBanks';
@@ -25,6 +26,7 @@ export default function Home() {
           <Simulator />
           <Problem />
           <Solution />
+          <WhyVeqto />
           <CreditFlow />
           <BenefitsAllies />
           <BenefitsBanks />
