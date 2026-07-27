@@ -24,9 +24,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Veqto | Crédito Vehicular Inteligente en Colombia",
   description:
-    "Veqto: el orquestador de crédito vehicular que conecta clientes, aliados comerciales, concesionarios y bancos en Colombia. Financiamiento rápido, seguro y 100% digital. Multi-banco en paralelo.",
+    "Facilita tu crédito vehicular con herramientas inteligentes basadas en IA. Somos el aliado que conecta concesionarios, empresas y entidades financieras para ofrecerte el mejor camino hacia tu vehículo, de forma rápida, segura y sin complicaciones.",
   keywords: [
     "crédito vehicular",
+    "facilitador de crédito vehicular",
     "crédito vehicular Colombia",
     "financiamiento auto",
     "fintech Colombia",
@@ -44,7 +45,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Veqto | Crédito Vehicular Inteligente en Colombia",
     description:
-      "Conectamos clientes, aliados comerciales y bancos para financiar tu próximo vehículo. Multi-banco en paralelo, cumplimiento Ley 1581.",
+      "Facilita tu crédito vehicular con herramientas inteligentes basadas en IA. Somos el aliado que conecta concesionarios, empresas y entidades financieras para ofrecerte el mejor camino hacia tu vehículo, de forma rápida, segura y sin complicaciones.",
     type: "website",
     locale: "es_CO",
     alternateLocale: "en_US",
@@ -63,7 +64,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Veqto | Crédito Vehicular Inteligente",
     description:
-      "Financiamiento de vehículos rápido, seguro y 100% digital en Colombia.",
+      "Facilita tu crédito vehicular con herramientas inteligentes basadas en IA. El aliado que conecta concesionarios, empresas y entidades financieras.",
     creator: "@veqto",
     images: ["/og-image.png"],
   },
@@ -96,7 +97,7 @@ const organizationSchema = {
   url: SITE_URL,
   logo: `${SITE_URL}/logos/Logo-veqto-Positivo.svg`,
   description:
-    "Orquestador de crédito vehicular que conecta clientes, aliados comerciales y bancos en Colombia.",
+    "Facilitador de crédito vehicular que conecta clientes, concesionarios, aliados comerciales y entidades financieras en Colombia.",
   taxID: "902.051.244-0",
   address: {
     "@type": "PostalAddress",
