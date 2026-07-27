@@ -98,9 +98,8 @@ export type Translations = {
   cta: {
     title: string;
     subtitle: string;
-    button1: string;
-    button2: string;
-    trustBadge: string;
+    /** Único botón del cierre: naranja, abre CreditRequestModal. */
+    button: string;
   };
   access: {
     navButton: string;
@@ -330,13 +329,11 @@ export const translations: Record<Locale, Translations> = {
       ctaButton: "¿Listo? Solicita tu crédito real",
     },
     cta: {
-      title: "¿Listo para transformar tu negocio?",
+      title:
+        "Más que una plataforma, un facilitador de crédito vehicular.",
       subtitle:
-        "Únete a la revolución del crédito vehicular en Colombia. Acelera tus ventas, simplifica tu operación y crece con Veqto.",
-      button1: "Solicitar Crédito",
-      button2: "Ser Aliado Comercial",
-      trustBadge:
-        "La plataforma de crédito vehicular más innovadora de Colombia",
+        "Veqto conecta a todos los actores del proceso para que la financiación deje de ser un obstáculo y se convierta en una experiencia simple, eficiente y transparente.",
+      button: "Solicitar Financiación",
     },
     access: {
       navButton: "Acceder a la plataforma",
@@ -593,13 +590,10 @@ export const translations: Record<Locale, Translations> = {
       ctaButton: "Ready? Apply for real credit",
     },
     cta: {
-      title: "Ready to transform your business?",
+      title: "More than a platform — a car financing enabler.",
       subtitle:
-        "Join the vehicle credit revolution in Colombia. Accelerate your sales, simplify your operation and grow with Veqto.",
-      button1: "Apply for Credit",
-      button2: "Become a Partner",
-      trustBadge:
-        "Colombia's most innovative vehicle credit platform",
+        "Veqto connects every player in the process so that financing stops being an obstacle and becomes a simple, efficient and transparent experience.",
+      button: "Request Financing",
     },
     access: {
       navButton: "Access the platform",
