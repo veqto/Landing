@@ -5,9 +5,17 @@
   --color-aurora: #00c4a0;
   --color-aurora-light: #e6f9f4;
   --color-aurora-dark: #00a387;
+  /* Verde claro de acento sobre fondos oscuros (paleta muestreada del diseño) */
+  --color-aurora-soft: #6cdac7;
   --color-negro: #0a0f1e;
   --color-coral: #ff5c2b;
-  --color-cream: #f5f7fa;
+  /* Claro muestreado del diseño (antes #f5f7fa) */
+  --color-cream: #f6f8f9;
+
+  /* CTA primario de conversión — muestreado del diseño aprobado.
+     Siempre con texto oscuro (--color-negro) encima para contraste AA. */
+  --color-naranja: #f7a34a;
+  --color-naranja-dark: #e08f36;
 
   /* Typography */
   --font-family-nunito: var(--font-nunito), "Nunito", -apple-system,
@@ -18,6 +26,7 @@
   --animate-marquee: marquee 40s linear infinite;
   --animate-float: float 6s ease-in-out infinite;
   --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
+  --animate-halo-pulse: halo-pulse 7s ease-in-out infinite;
 }
 
 /* Keyframes */
@@ -37,6 +46,19 @@
   }
   50% {
     transform: translateY(-20px);
+  }
+}
+
+/* Halo verde del hero: respiración lenta de escala + opacidad */
+@keyframes halo-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.85;
   }
 }
 
@@ -118,6 +140,12 @@
 
   .link-hover:hover::after {
     @apply w-full;
+  }
+
+  /* Esquina doblada de las tarjetas blancas ("Un solo proceso").
+     Se combina con utilidades de posición y `rotate-*` para elegir la esquina. */
+  .corner-fold {
+    clip-path: polygon(100% 0, 0 0, 100% 100%);
   }
 
   /* GPU-accelerated animation hints */
