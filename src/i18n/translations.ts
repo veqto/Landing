@@ -68,7 +68,7 @@ export type Translations = {
     trustStatement: string;
   };
   simulator: {
-    title: string;
+    titleSegments: TitleSegment[];
     vehiclePrice: string;
     downPayment: string;
     downPaymentLabel: string;
@@ -287,7 +287,11 @@ export const translations: Record<Locale, Translations> = {
         "Veqto es tu aliado tecnológico para expandir tu cartera de crédito vehicular con confianza y resultados mensurables.",
     },
     simulator: {
-      title: "Simulador de Crédito",
+      titleSegments: [
+        { text: "Simula " },
+        { text: "tu crédito", highlight: true },
+        { text: " en segundos" },
+      ],
       vehiclePrice: "Precio del Vehículo",
       downPayment: "Cuota Inicial",
       downPaymentLabel: "% del precio",
@@ -537,7 +541,11 @@ export const translations: Record<Locale, Translations> = {
         "Veqto is your technology partner to expand your vehicle credit portfolio with confidence and measurable results.",
     },
     simulator: {
-      title: "Credit Simulator",
+      titleSegments: [
+        { text: "Simulate " },
+        { text: "your loan", highlight: true },
+        { text: " in seconds" },
+      ],
       vehiclePrice: "Vehicle Price",
       downPayment: "Down Payment",
       downPaymentLabel: "% of price",

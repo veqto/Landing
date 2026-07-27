@@ -3,12 +3,18 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import type { TitleSegment } from '@/i18n/translations';
+import HighlightedText from '@/components/ui/HighlightedText';
 
 interface SectionHeadingProps {
-  title: string;
+  /** Texto plano, o segmentos cuando el titular lleva resaltado parcial. */
+  title: string | TitleSegment[];
   subtitle?: string;
   centered?: boolean;
   light?: boolean;
+  /** Línea de acento verde sobre el titular. El diseño nuevo la omite en varias secciones. */
+  accent?: boolean;
+  highlightClassName?: string;
   className?: string;
 }
 
@@ -17,8 +23,13 @@ const SectionHeading: React.FC<SectionHeadingProps> = ({
   subtitle,
   centered = false,
   light = false,
+  accent = true,
+  highlightClassName = 'text-aurora',
   className,
 }) => {
+  const segments: TitleSegment[] =
+    typeof title === 'string' ? [{ text: title }] : title;
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -55,13 +66,15 @@ const SectionHeading: React.FC<SectionHeadingProps> = ({
       viewport={{ once: true, margin: '0px 0px -100px 0px' }}
     >
       {/* Accent line */}
-      <motion.div
-        className={cn(
-          'h-1 w-16 rounded-full bg-[#00C4A0] mb-4',
-          centered && 'mx-auto'
-        )}
-        variants={itemVariants}
-      />
+      {accent && (
+        <motion.div
+          className={cn(
+            'h-1 w-16 rounded-full bg-[#00C4A0] mb-4',
+            centered && 'mx-auto'
+          )}
+          variants={itemVariants}
+        />
+      )}
 
       {/* Title */}
       <motion.h2
@@ -72,7 +85,7 @@ const SectionHeading: React.FC<SectionHeadingProps> = ({
         )}
         variants={itemVariants}
       >
-        {title}
+        <HighlightedText segments={segments} highlightClassName={highlightClassName} />
       </motion.h2>
 
       {/* Subtitle */}

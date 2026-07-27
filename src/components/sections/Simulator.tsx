@@ -73,11 +73,12 @@ const Simulator: React.FC = () => {
   const termOptions = [12, 24, 36, 48, 60, 72];
 
   return (
-    <AnimatedSection id="simulador" className="py-16 md:py-24 bg-gradient-to-br from-white via-gray-50 to-gray-100">
+    <AnimatedSection id="simulador" className="py-16 md:py-24 bg-cream">
       <Container>
         <SectionHeading
-          title={t.simulator.title}
+          title={t.simulator.titleSegments}
           centered
+          accent={false}
           className="mb-12 md:mb-16"
         />
 
