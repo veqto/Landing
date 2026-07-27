@@ -32,7 +32,7 @@ const BenefitsBanks: React.FC = () => {
   return (
     <section
       id="beneficios-bancos"
-      className="relative bg-negro py-24 md:py-32 lg:py-40 overflow-hidden"
+      className="relative bg-negro py-20 md:py-28 overflow-hidden"
     >
       {/* Grid pattern overlay */}
       <div className="absolute inset-0 opacity-5 z-0 pointer-events-none">
@@ -52,12 +52,13 @@ const BenefitsBanks: React.FC = () => {
 
       <Container className="relative z-10">
         {/* Section Heading */}
-        <div className="mb-16 md:mb-20">
+        <div className="mb-12 md:mb-16">
           <SectionHeading
             title={t.benefitsBanks.title}
             subtitle={t.benefitsBanks.subtitle}
             centered
             light
+            accent={false}
           />
         </div>
 
@@ -105,7 +106,7 @@ const BenefitsBanks: React.FC = () => {
 
         {/* Trust statement */}
         <motion.div
-          className="mt-20 text-center"
+          className="mt-14 text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={viewportConfig}
