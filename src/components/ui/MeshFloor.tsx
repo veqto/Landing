@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useId } from 'react';
 import { cn } from '@/lib/utils';
 
 interface MeshFloorProps {
@@ -49,31 +51,42 @@ const verticalPath = (col: number) => {
  * Malla ondulada verde tipo wireframe que hace de "piso" en las secciones
  * oscuras (hero y CTA final) del diseño aprobado. Puramente decorativa.
  */
-const MeshFloor: React.FC<MeshFloorProps> = ({ className }) => (
-  <svg
-    viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-    preserveAspectRatio="none"
-    className={cn('pointer-events-none select-none', className)}
-    aria-hidden="true"
-    focusable="false"
-  >
-    <defs>
-      <linearGradient id="mesh-fade" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="#00c4a0" stopOpacity="0" />
-        <stop offset="45%" stopColor="#00c4a0" stopOpacity="0.35" />
-        <stop offset="100%" stopColor="#6cdac7" stopOpacity="0.7" />
-      </linearGradient>
-    </defs>
+const MeshFloor: React.FC<MeshFloorProps> = ({ className }) => {
+  // El componente se monta dos veces (hero y CTA final): el id del gradiente
+  // debe ser único o el segundo SVG referenciaría el <defs> del primero.
+  const gradientId = useId();
 
-    <g stroke="url(#mesh-fade)" fill="none" strokeWidth="1" vectorEffect="non-scaling-stroke">
-      {Array.from({ length: COLS + 1 }, (_, col) => (
-        <path key={`v-${col}`} d={verticalPath(col)} />
-      ))}
-      {Array.from({ length: ROWS + 1 }, (_, row) => (
-        <path key={`h-${row}`} d={horizontalPath(row)} />
-      ))}
-    </g>
-  </svg>
-);
+  return (
+    <svg
+      viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
+      preserveAspectRatio="none"
+      className={cn('pointer-events-none select-none', className)}
+      aria-hidden="true"
+      focusable="false"
+    >
+      <defs>
+        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#00c4a0" stopOpacity="0" />
+          <stop offset="45%" stopColor="#00c4a0" stopOpacity="0.35" />
+          <stop offset="100%" stopColor="#6cdac7" stopOpacity="0.7" />
+        </linearGradient>
+      </defs>
+
+      <g
+        stroke={`url(#${gradientId})`}
+        fill="none"
+        strokeWidth="1"
+        vectorEffect="non-scaling-stroke"
+      >
+        {Array.from({ length: COLS + 1 }, (_, col) => (
+          <path key={`v-${col}`} d={verticalPath(col)} />
+        ))}
+        {Array.from({ length: ROWS + 1 }, (_, row) => (
+          <path key={`h-${row}`} d={horizontalPath(row)} />
+        ))}
+      </g>
+    </svg>
+  );
+};
 
 export default MeshFloor;
