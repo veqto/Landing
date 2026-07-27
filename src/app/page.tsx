@@ -4,7 +4,8 @@ import { LanguageProvider } from '@/i18n/LanguageContext';
 import { ModalProvider } from '@/components/ModalContext';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/sections/Hero';
-import WhatIsVeqto from '@/components/sections/WhatIsVeqto';
+import Problem from '@/components/sections/Problem';
+import Solution from '@/components/sections/Solution';
 import CreditFlow from '@/components/sections/CreditFlow';
 import BenefitsAllies from '@/components/sections/BenefitsAllies';
 import BenefitsBanks from '@/components/sections/BenefitsBanks';
@@ -22,7 +23,8 @@ export default function Home() {
         <main>
           <Hero />
           <Simulator />
-          <WhatIsVeqto />
+          <Problem />
+          <Solution />
           <CreditFlow />
           <BenefitsAllies />
           <BenefitsBanks />

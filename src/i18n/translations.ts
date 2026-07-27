@@ -32,13 +32,20 @@ export type Translations = {
     ctaSecondary: string;
     imageAlt: string;
   };
-  whatIs: {
+  problem: {
     title: string;
+    intro: string;
+    items: string[];
+  };
+  solution: {
+    titleTop: string;
+    titleBottom: string;
     description: string;
-    features: Array<{
+    cards: Array<{
       title: string;
       description: string;
     }>;
+    imageAlt: string;
   };
   creditFlow: {
     title: string;
@@ -154,42 +161,44 @@ export const translations: Record<Locale, Translations> = {
       imageAlt:
         "Cliente junto a su vehículo con el estudio de crédito Veqto aprobado",
     },
-    whatIs: {
-      title: "¿Qué es Veqto?",
+    problem: {
+      title: "Conseguir un crédito vehicular no debería ser complicado",
+      intro: "Hoy comprar un vehículo implica:",
+      items: [
+        "Llenar formularios varias veces.",
+        "Esperar respuestas de diferentes bancos.",
+        "No saber cuál oferta es realmente la mejor.",
+        "Perder tiempo entre concesionarios y trámites.",
+      ],
+    },
+    solution: {
+      titleTop: "Un solo proceso",
+      titleBottom: "Múltiples entidades financieras.",
       description:
-        "Veqto es el orquestador de crédito vehicular que conecta clientes, aliados comerciales y concesionarios con bancos en Colombia. Hacemos que el financiamiento sea transparente, eficiente y sin fricciones.",
-      features: [
+        "Con Veqto centralizas todo el proceso en una sola plataforma.",
+      cards: [
         {
-          title: "Proceso 100% Digital",
+          title: "Compara opciones",
           description:
-            "Sin papeleos ni trámites presenciales. Todo desde tu celular o computador.",
+            "Accede a diferentes entidades financieras desde un solo lugar.",
         },
         {
-          title: "Aprobación Rápida",
+          title: "Más transparencia",
           description:
-            "Pre-aprobación en menos de 5 minutos con scoring de IA avanzado.",
+            "Conoce las condiciones y toma decisiones con información clara.",
         },
         {
-          title: "Multi-Banco",
+          title: "Respuestas más rápidas",
           description:
-            "Conectamos con múltiples entidades financieras para encontrar la mejor tasa para ti.",
+            "Menos trámites y más agilidad para avanzar hacia tu vehículo.",
         },
         {
-          title: "Red de Aliados",
-          description:
-            "Aliados comerciales y concesionarios conectados en todo Colombia.",
-        },
-        {
-          title: "Rápido y Eficiente",
-          description:
-            "Reduce el tiempo de aprobación de semanas a horas con nuestra tecnología.",
-        },
-        {
-          title: "Crece con Nosotros",
-          description:
-            "Métricas en tiempo real y herramientas para escalar tu negocio.",
+          title: "Acompañamiento",
+          description: "Te guiamos durante todo el proceso.",
         },
       ],
+      imageAlt:
+        "Persona consultando el avance de su solicitud de crédito en la app de Veqto",
     },
     creditFlow: {
       title: "¿Cómo funciona?",
@@ -408,42 +417,44 @@ export const translations: Record<Locale, Translations> = {
       imageAlt:
         "Customer next to their vehicle with an approved Veqto credit assessment",
     },
-    whatIs: {
-      title: "What is Veqto?",
+    problem: {
+      title: "Getting a car loan shouldn't be complicated",
+      intro: "Today, buying a vehicle means:",
+      items: [
+        "Filling out the same forms over and over.",
+        "Waiting on answers from different banks.",
+        "Not knowing which offer is really the best.",
+        "Losing time between dealerships and paperwork.",
+      ],
+    },
+    solution: {
+      titleTop: "One process",
+      titleBottom: "Multiple financial institutions.",
       description:
-        "Veqto is the vehicle credit orchestrator that connects customers, car dealerships and banks in Colombia. We make financing transparent, efficient and frictionless.",
-      features: [
+        "With Veqto you centralize the entire process in a single platform.",
+      cards: [
         {
-          title: "100% Digital Process",
+          title: "Compare options",
           description:
-            "No paperwork or in-person procedures. Everything from your phone or computer.",
+            "Reach different financial institutions from a single place.",
         },
         {
-          title: "Fast Approval",
+          title: "More transparency",
           description:
-            "Pre-approval in less than 5 minutes with advanced AI scoring.",
+            "Know the conditions and make decisions with clear information.",
         },
         {
-          title: "Multi-Bank",
+          title: "Faster answers",
           description:
-            "We connect with multiple financial institutions to find the best rate for you.",
+            "Less paperwork and more speed on the way to your vehicle.",
         },
         {
-          title: "Partner Network",
-          description:
-            "Dealerships and car lots connected throughout Colombia.",
-        },
-        {
-          title: "Fast & Efficient",
-          description:
-            "Reduce approval time from weeks to hours with our technology.",
-        },
-        {
-          title: "Grow With Us",
-          description:
-            "Real-time metrics and tools to scale your business.",
+          title: "Guidance",
+          description: "We guide you through the entire process.",
         },
       ],
+      imageAlt:
+        "Person checking the progress of their credit application in the Veqto app",
     },
     creditFlow: {
       title: "How does it work?",
