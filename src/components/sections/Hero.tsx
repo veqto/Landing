@@ -21,6 +21,7 @@ import { motion } from "framer-motion";
 import { useTranslation } from "@/i18n/LanguageContext";
 import { useModal } from "@/components/ModalContext";
 import Button from "@/components/ui/Button";
+import HighlightedText from "@/components/ui/HighlightedText";
 import HeroIllustration from "@/components/sections/HeroIllustration";
 
 const emptySubscribe = () => () => {};
@@ -61,11 +62,6 @@ const Hero = () => {
       transition: { delay, duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
     }),
   };
-
-  const isHighlightWord = (word: string) =>
-    t.hero.highlightWords.some((hw) =>
-      word.toLowerCase().includes(hw.toLowerCase())
-    );
 
   return (
     <section
@@ -119,18 +115,10 @@ const Hero = () => {
               animate={isVisible ? "visible" : "hidden"}
               className="text-4xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl font-extrabold text-white leading-[1.1] tracking-tight"
             >
-              {t.hero.title.split(" ").map((word, i) => (
-                <span key={`word-${i}`}>
-                  {isHighlightWord(word) ? (
-                    <span className="bg-gradient-to-r from-aurora via-aurora to-aurora-dark bg-clip-text text-transparent">
-                      {word}
-                    </span>
-                  ) : (
-                    word
-                  )}
-                  {i < t.hero.title.split(" ").length - 1 ? " " : ""}
-                </span>
-              ))}
+              <HighlightedText
+                segments={t.hero.titleSegments}
+                highlightClassName="bg-gradient-to-r from-aurora via-aurora to-aurora-dark bg-clip-text text-transparent"
+              />
             </motion.h1>
 
             {/* Subtitle */}

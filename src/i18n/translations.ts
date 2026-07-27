@@ -1,5 +1,17 @@
 export type Locale = "es" | "en";
 
+/**
+ * Fragmento de un titular con resaltado explícito.
+ *
+ * Los segmentos se concatenan literalmente al renderizar, así que los espacios
+ * de separación deben ir dentro del `text`. Sustituye al esquema anterior de
+ * `highlightWords`, que hacía match por substring y resaltaba de más en EN.
+ */
+export type TitleSegment = {
+  text: string;
+  highlight?: boolean;
+};
+
 export type Translations = {
   navbar: {
     home: string;
@@ -10,8 +22,7 @@ export type Translations = {
     cta: string;
   };
   hero: {
-    title: string;
-    highlightWords: string[];
+    titleSegments: TitleSegment[];
     subtitle: string;
     /** CTA principal del Hero (scroll a simulador). Reemplaza cta1+cta2 del v1. */
     ctaPrimary: string;
@@ -132,8 +143,7 @@ export const translations: Record<Locale, Translations> = {
       cta: "Solicitar Crédito",
     },
     hero: {
-      title: "Crédito Vehicular Inteligente",
-      highlightWords: ["Crédito", "Vehicular", "Inteligente"],
+      titleSegments: [{ text: "Crédito Vehicular Inteligente", highlight: true }],
       subtitle:
         "Conectamos clientes, concesionarios y bancos para financiar tu próximo vehículo de forma rápida, segura y transparente en Colombia.",
       ctaPrimary: "Simular mi crédito",
@@ -379,8 +389,7 @@ export const translations: Record<Locale, Translations> = {
       cta: "Apply for Credit",
     },
     hero: {
-      title: "Smart Vehicle Credit",
-      highlightWords: ["Smart", "Vehicle", "Credit"],
+      titleSegments: [{ text: "Smart Vehicle Credit", highlight: true }],
       subtitle:
         "We connect customers, dealers and banks to finance your next vehicle quickly, securely and transparently in Colombia.",
       ctaPrimary: "Simulate my credit",
