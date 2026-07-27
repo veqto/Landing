@@ -136,8 +136,8 @@ export const translations: Record<Locale, Translations> = {
   es: {
     navbar: {
       home: "Inicio",
-      about: "Qué es Veqto",
-      creditFlow: "Flujo de Crédito",
+      about: "¿Qué es?",
+      creditFlow: "¿Cómo funciona?",
       benefits: "Beneficios",
       simulator: "Simulador",
       cta: "Solicitar Crédito",
@@ -382,8 +382,8 @@ export const translations: Record<Locale, Translations> = {
   en: {
     navbar: {
       home: "Home",
-      about: "About Veqto",
-      creditFlow: "Credit Flow",
+      about: "What is it?",
+      creditFlow: "How it works",
       benefits: "Benefits",
       simulator: "Simulator",
       cta: "Apply for Credit",

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter, usePathname } from "next/navigation";
 import { useTranslation } from "@/i18n/LanguageContext";
+import { useModal } from "@/components/ModalContext";
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 import AccessButton from "@/components/ui/AccessButton";
 import { cn } from "@/lib/utils";
@@ -15,6 +16,7 @@ interface NavLink {
 
 const Navbar: React.FC = () => {
   const { t } = useTranslation();
+  const { openCreditModal } = useModal();
   const router = useRouter();
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -148,12 +150,21 @@ const Navbar: React.FC = () => {
             ))}
           </div>
 
-          {/* Right Side — CTA "Solicitar Crédito" se removió del navbar para evitar
-              duplicación con el CTA primario del Hero (1 mensaje / 1 botón). */}
+          {/* Right Side — el diseño aprobado reintroduce "Solicitar Crédito"
+              en el navbar como outline claro, junto al acceso a plataforma. */}
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="hidden sm:block">
               <LanguageSwitcher />
             </div>
+
+            <motion.button
+              onClick={openCreditModal}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
+              className="hidden lg:inline-flex items-center justify-center rounded-full border-2 border-white/70 px-4 py-2 text-xs sm:text-sm font-semibold text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-negro"
+            >
+              {t.navbar.cta}
+            </motion.button>
 
             <AccessButton
               label={t.access.navButton}
@@ -219,6 +230,16 @@ const Navbar: React.FC = () => {
                 ))}
 
                 <div className="border-t border-white/10 my-2 pt-3 flex flex-col gap-3">
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      openCreditModal();
+                    }}
+                    className="w-full rounded-full border-2 border-white/70 px-4 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-negro"
+                  >
+                    {t.navbar.cta}
+                  </button>
+
                   <AccessButton
                     label={t.access.navButton}
                     size="sm"
