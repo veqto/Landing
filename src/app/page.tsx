@@ -8,7 +8,7 @@ import Problem from '@/components/sections/Problem';
 import Solution from '@/components/sections/Solution';
 import WhyVeqto from '@/components/sections/WhyVeqto';
 import CreditFlow from '@/components/sections/CreditFlow';
-import BenefitsAllies from '@/components/sections/BenefitsAllies';
+import Ecosystem from '@/components/sections/Ecosystem';
 import BenefitsBanks from '@/components/sections/BenefitsBanks';
 import Simulator from '@/components/sections/Simulator';
 import CTASection from '@/components/sections/CTASection';
@@ -28,7 +28,7 @@ export default function Home() {
           <Solution />
           <WhyVeqto />
           <CreditFlow />
-          <BenefitsAllies />
+          <Ecosystem />
           <BenefitsBanks />
           <CTASection />
         </main>

@@ -61,13 +61,15 @@ export type Translations = {
     };
     imageAlt: string;
   };
-  benefitsAllies: {
-    title: string;
-    subtitle: string;
-    items: Array<{
+  ecosystem: {
+    titleSegments: TitleSegment[];
+    cards: Array<{
       title: string;
       description: string;
     }>;
+    /** Enlace dentro de la tarjeta de aliados; abre AllyRegistrationModal. */
+    allyCta: string;
+    imageAlt: string;
   };
   benefitsBanks: {
     title: string;
@@ -244,41 +246,30 @@ export const translations: Record<Locale, Translations> = {
       },
       imageAlt: "Clienta celebrando con las llaves de su vehículo nuevo",
     },
-    benefitsAllies: {
-      title: "Beneficios para Aliados",
-      subtitle: "Más ventas, procesos ágiles y herramientas digitales para tu negocio",
-      items: [
+    ecosystem: {
+      titleSegments: [
+        { text: "La plataforma que conecta a todo el " },
+        { text: "ecosistema automotor", highlight: true },
+      ],
+      cards: [
         {
-          title: "Más Ventas",
+          title: "Para concesionarios",
           description:
-            "Acceso a más clientes con capacidad de compra a través de nuestra plataforma de financiamiento.",
+            "Aumenta cierres y agiliza la aprobación de créditos.",
         },
         {
-          title: "Proceso Ágil",
+          title: "Para aliados comerciales",
           description:
-            "Aprobaciones rápidas que permiten cerrar ventas en menos tiempo sin papeleo.",
+            "Gestiona oportunidades y da seguimiento a tus clientes.",
         },
         {
-          title: "Sin Costo",
+          title: "Para entidades financieras",
           description:
-            "Integración sin comisiones ocultas. Modelo transparente y justo para tu negocio.",
-        },
-        {
-          title: "Gestión Digital",
-          description:
-            "Portal completo para gestionar solicitudes y documentación de forma eficiente.",
-        },
-        {
-          title: "Reportes en Tiempo Real",
-          description:
-            "Seguimiento detallado de cada transacción y estado de créditos al instante.",
-        },
-        {
-          title: "Soporte Dedicado",
-          description:
-            "Equipo especializado para resolver dudas y optimizar tus resultados de venta.",
+            "Recibe solicitudes estructuradas y optimiza la colocación de crédito.",
         },
       ],
+      allyCta: "Quiero ser aliado",
+      imageAlt: "Asesor de concesionario atendiendo a un cliente",
     },
     benefitsBanks: {
       title: "Beneficios para Bancos",
@@ -519,41 +510,29 @@ export const translations: Record<Locale, Translations> = {
       },
       imageAlt: "Customer celebrating with the keys to her new vehicle",
     },
-    benefitsAllies: {
-      title: "Benefits for Partners",
-      subtitle: "More sales, agile processes, and digital tools for your dealership",
-      items: [
+    ecosystem: {
+      titleSegments: [
+        { text: "The platform that connects the entire " },
+        { text: "automotive ecosystem", highlight: true },
+      ],
+      cards: [
         {
-          title: "More Sales",
-          description:
-            "Access to more customers with purchasing power through our financing platform.",
+          title: "For dealerships",
+          description: "Close more sales and speed up credit approvals.",
         },
         {
-          title: "Agile Process",
+          title: "For commercial partners",
           description:
-            "Fast approvals that allow you to close sales in less time without paperwork.",
+            "Manage opportunities and follow up with your clients.",
         },
         {
-          title: "No Cost",
+          title: "For financial institutions",
           description:
-            "Integration without hidden commissions. Transparent and fair model for your business.",
-        },
-        {
-          title: "Digital Management",
-          description:
-            "Complete portal to manage requests and documentation efficiently.",
-        },
-        {
-          title: "Real-time Reports",
-          description:
-            "Detailed tracking of each transaction and instant credit status.",
-        },
-        {
-          title: "Dedicated Support",
-          description:
-            "Specialized team to resolve questions and optimize your sales results.",
+            "Receive structured applications and optimize credit placement.",
         },
       ],
+      allyCta: "I want to be a partner",
+      imageAlt: "Dealership advisor assisting a customer",
     },
     benefitsBanks: {
       title: "Benefits for Banks",
