@@ -52,14 +52,14 @@ export type Translations = {
     items: string[];
   };
   creditFlow: {
-    title: string;
-    subtitle?: string;
+    titleSegments: TitleSegment[];
     steps: {
       [key: string]: {
         title: string;
         description: string;
       };
     };
+    imageAlt: string;
   };
   benefitsAllies: {
     title: string;
@@ -218,25 +218,31 @@ export const translations: Record<Locale, Translations> = {
       ],
     },
     creditFlow: {
-      title: "¿Cómo funciona?",
-      subtitle: "Así te ayudamos a avanzar",
+      titleSegments: [
+        { text: "Obtener tu crédito " },
+        { text: "es más fácil de lo que imaginas", highlight: true },
+      ],
       steps: {
         "1": {
-          title: "Entendemos tu perfil",
-          description:
-            "No todos los bancos prestan igual. Analizamos tu caso antes de mostrar opciones.",
+          title: "Cuéntanos qué vehículo buscas",
+          description: "Nuevo o usado.",
         },
         "2": {
-          title: "Ordenamos las mejores alternativas",
+          title: "Analizamos tu perfil",
           description:
-            "Hacemos competir a los bancos y traducimos el crédito a lenguaje claro.",
+            "Conectamos tu solicitud con las entidades financieras.",
         },
         "3": {
-          title: "Te acompañamos hasta decidir bien",
+          title: "Recibes las mejores opciones",
+          description: "Compara tasas, plazos y condiciones.",
+        },
+        "4": {
+          title: "Elige y estrena",
           description:
-            "No firmas a ciegas ni pierdes tiempo. Avanzas con seguridad.",
+            "Nos encargamos de que el proceso sea simple y transparente.",
         },
       },
+      imageAlt: "Clienta celebrando con las llaves de su vehículo nuevo",
     },
     benefitsAllies: {
       title: "Beneficios para Aliados",
@@ -487,25 +493,31 @@ export const translations: Record<Locale, Translations> = {
       ],
     },
     creditFlow: {
-      title: "How does it work?",
-      subtitle: "This is how we help you move forward",
+      titleSegments: [
+        { text: "Getting your loan " },
+        { text: "is easier than you think", highlight: true },
+      ],
       steps: {
         "1": {
-          title: "We understand your profile",
-          description:
-            "Not all banks lend the same way. We analyze your case before showing options.",
+          title: "Tell us which vehicle you want",
+          description: "New or used.",
         },
         "2": {
-          title: "We sort the best alternatives",
+          title: "We analyze your profile",
           description:
-            "We make banks compete and translate the credit into clear language.",
+            "We connect your application with the financial institutions.",
         },
         "3": {
-          title: "We accompany you to decide well",
+          title: "You get the best options",
+          description: "Compare rates, terms and conditions.",
+        },
+        "4": {
+          title: "Choose and drive away",
           description:
-            "You don't sign blindly nor waste time. You move forward confidently.",
+            "We make sure the process stays simple and transparent.",
         },
       },
+      imageAlt: "Customer celebrating with the keys to her new vehicle",
     },
     benefitsAllies: {
       title: "Benefits for Partners",
