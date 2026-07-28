@@ -90,6 +90,11 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* El contenedor de scroll de framer-motion es document.scrollingElement,
+       es decir <html>. Si queda `static`, useScroll({ target }) no puede medir
+       el offset del target de forma fiable (avisa en dev). Con `relative`,
+       <html> entra en la cadena de offsetParent y el parallax mide bien. */
+    position: relative;
   }
 
   body {

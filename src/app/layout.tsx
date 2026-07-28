@@ -114,8 +114,17 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // data-scroll-behavior="smooth": en Next 16 el router ya no neutraliza
+  // `scroll-behavior: smooth` durante las transiciones de ruta. Sin este
+  // atributo, ir a /acceder o a una legal se animaría como un scroll largo.
+  // Con él la navegación vuelve a ser instantánea y el scroll suave queda
+  // solo para los anchors internos del navbar.
   return (
-    <html lang="es" className={`${nunito.variable} h-full antialiased scroll-smooth`}>
+    <html
+      lang="es"
+      data-scroll-behavior="smooth"
+      className={`${nunito.variable} h-full antialiased scroll-smooth`}
+    >
       <body className="min-h-full flex flex-col bg-cream text-negro font-nunito">
         {/* JSON-LD structured data para SEO */}
         <script
