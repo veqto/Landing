@@ -52,10 +52,18 @@ const Hero: React.FC = () => {
         <div className="absolute -left-24 bottom-[18%] h-72 w-72 rounded-full bg-aurora/10 blur-3xl" />
       </div>
 
-      {/* Piso de malla ondulada */}
-      <MeshFloor className="absolute inset-x-0 bottom-0 z-0 h-28 w-full opacity-60 sm:h-40 lg:h-56" />
+      {/* Piso de malla ondulada.
+          La banda es proporcionalmente enorme frente a la foto en pantallas
+          angostas: a 375px subía 112px y el contenido visible de la imagen
+          acaba a 82px del fondo, así que las líneas cruzaban los últimos 30px
+          del coche y lo hacían leer como recortado (el PNG es transparente
+          alrededor del vehículo, de modo que la malla se ve a través). Se
+          rebaja la banda en mobile/tablet; en lg el ratio ya funciona. */}
+      <MeshFloor className="absolute inset-x-0 bottom-0 z-0 h-20 w-full opacity-60 sm:h-24 lg:h-56" />
 
-      <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-10 px-4 pb-16 pt-28 sm:px-6 sm:pb-20 sm:pt-32 lg:grid-cols-[45fr_55fr] lg:gap-6 lg:px-8 lg:pb-28">
+      {/* pb mayor en mobile/tablet: ahí la foto es el último elemento de la
+          columna única y necesita separarse de la banda de malla. */}
+      <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-10 px-4 pb-24 pt-28 sm:px-6 sm:pb-28 sm:pt-32 lg:grid-cols-[45fr_55fr] lg:gap-6 lg:px-8 lg:pb-28">
         {/* Columna izquierda: texto + CTAs */}
         <motion.div
           variants={cascade}
