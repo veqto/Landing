@@ -13,26 +13,20 @@ import {
 import { useTranslation } from '@/i18n/LanguageContext';
 import Container from '@/components/ui/Container';
 import SectionHeading from '@/components/ui/SectionHeading';
-import { staggerContainer, viewportConfig } from '@/lib/animations';
+import { useReveal, REVEAL_VIEWPORT } from '@/hooks/useReveal';
 
 const BenefitsBanks: React.FC = () => {
   const { t } = useTranslation();
+  const { container, item } = useReveal();
 
   const icons = [Building2, Target, BarChart3, Lock, GitBranch, Wallet];
 
-  const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 },
-    },
-  };
+  const cardVariants = item('up');
 
   return (
     <section
       id="beneficios-bancos"
-      className="relative bg-negro py-24 md:py-32 lg:py-40 overflow-hidden"
+      className="relative bg-negro py-20 md:py-28 overflow-hidden"
     >
       {/* Grid pattern overlay */}
       <div className="absolute inset-0 opacity-5 z-0 pointer-events-none">
@@ -52,12 +46,13 @@ const BenefitsBanks: React.FC = () => {
 
       <Container className="relative z-10">
         {/* Section Heading */}
-        <div className="mb-16 md:mb-20">
+        <div className="mb-12 md:mb-16">
           <SectionHeading
             title={t.benefitsBanks.title}
             subtitle={t.benefitsBanks.subtitle}
             centered
             light
+            accent={false}
           />
         </div>
 
@@ -66,8 +61,8 @@ const BenefitsBanks: React.FC = () => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
           initial="hidden"
           whileInView="visible"
-          viewport={viewportConfig}
-          variants={staggerContainer}
+          viewport={REVEAL_VIEWPORT}
+          variants={container()}
         >
           {t.benefitsBanks.items.map((item, index) => {
             const IconComponent = icons[index];
@@ -105,10 +100,10 @@ const BenefitsBanks: React.FC = () => {
 
         {/* Trust statement */}
         <motion.div
-          className="mt-20 text-center"
+          className="mt-14 text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={viewportConfig}
+          viewport={REVEAL_VIEWPORT}
           transition={{ delay: 0.4, duration: 0.6 }}
         >
           <p className="text-gray-400 text-lg md:text-xl">

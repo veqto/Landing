@@ -3,12 +3,19 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import type { TitleSegment } from '@/i18n/translations';
+import HighlightedText from '@/components/ui/HighlightedText';
+import { useReveal, REVEAL_VIEWPORT } from '@/hooks/useReveal';
 
 interface SectionHeadingProps {
-  title: string;
+  /** Texto plano, o segmentos cuando el titular lleva resaltado parcial. */
+  title: string | TitleSegment[];
   subtitle?: string;
   centered?: boolean;
   light?: boolean;
+  /** Línea de acento verde sobre el titular. El diseño nuevo la omite en varias secciones. */
+  accent?: boolean;
+  highlightClassName?: string;
   className?: string;
 }
 
@@ -17,30 +24,15 @@ const SectionHeading: React.FC<SectionHeadingProps> = ({
   subtitle,
   centered = false,
   light = false,
+  accent = true,
+  highlightClassName = 'text-aurora',
   className,
 }) => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1,
-      },
-    },
-  };
+  const segments: TitleSegment[] =
+    typeof title === 'string' ? [{ text: title }] : title;
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        
-      },
-    },
-  };
+  const { container, item } = useReveal();
+  const itemVariants = item('up');
 
   return (
     <motion.div
@@ -49,19 +41,21 @@ const SectionHeading: React.FC<SectionHeadingProps> = ({
         centered && 'items-center',
         className
       )}
-      variants={containerVariants}
+      variants={container(0.12)}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: '0px 0px -100px 0px' }}
+      viewport={REVEAL_VIEWPORT}
     >
       {/* Accent line */}
-      <motion.div
-        className={cn(
-          'h-1 w-16 rounded-full bg-[#00C4A0] mb-4',
-          centered && 'mx-auto'
-        )}
-        variants={itemVariants}
-      />
+      {accent && (
+        <motion.div
+          className={cn(
+            'h-1 w-16 rounded-full bg-[#00C4A0] mb-4',
+            centered && 'mx-auto'
+          )}
+          variants={itemVariants}
+        />
+      )}
 
       {/* Title */}
       <motion.h2
@@ -72,7 +66,7 @@ const SectionHeading: React.FC<SectionHeadingProps> = ({
         )}
         variants={itemVariants}
       >
-        {title}
+        <HighlightedText segments={segments} highlightClassName={highlightClassName} />
       </motion.h2>
 
       {/* Subtitle */}

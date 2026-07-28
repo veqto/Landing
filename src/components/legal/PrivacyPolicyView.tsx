@@ -51,7 +51,7 @@ const PrivacyPolicyView: React.FC = () => {
           <tr><Th>Responsable</Th><Td>VEQTO S.A.S</Td></tr>
           <tr><Th>NIT</Th><Td>902.051.244-0</Td></tr>
           <tr><Th>Domicilio</Th><Td>Bogotá D.C., Colombia</Td></tr>
-          <tr><Th>Correo</Th><Td>informacion@veqto.co</Td></tr>
+          <tr><Th>Correo</Th><Td>informacion@veqto.ai</Td></tr>
           <tr><Th>Representante Legal</Th><Td>Mauricio Alexander Quiroga Fuquene</Td></tr>
           <tr><Th>Normativa</Th><Td>Ley 1581 de 2012 · Decreto 1377 de 2013 · Decreto 2300 de 2023</Td></tr>
         </tbody>

@@ -3,10 +3,13 @@
 import { LanguageProvider } from '@/i18n/LanguageContext';
 import { ModalProvider } from '@/components/ModalContext';
 import Navbar from '@/components/Navbar';
+import ScrollProgress from '@/components/ui/ScrollProgress';
 import Hero from '@/components/sections/Hero';
-import WhatIsVeqto from '@/components/sections/WhatIsVeqto';
+import Problem from '@/components/sections/Problem';
+import Solution from '@/components/sections/Solution';
+import WhyVeqto from '@/components/sections/WhyVeqto';
 import CreditFlow from '@/components/sections/CreditFlow';
-import BenefitsAllies from '@/components/sections/BenefitsAllies';
+import Ecosystem from '@/components/sections/Ecosystem';
 import BenefitsBanks from '@/components/sections/BenefitsBanks';
 import Simulator from '@/components/sections/Simulator';
 import CTASection from '@/components/sections/CTASection';
@@ -18,13 +21,16 @@ export default function Home() {
   return (
     <LanguageProvider>
       <ModalProvider>
+        <ScrollProgress />
         <Navbar />
         <main>
           <Hero />
           <Simulator />
-          <WhatIsVeqto />
+          <Problem />
+          <Solution />
+          <WhyVeqto />
           <CreditFlow />
-          <BenefitsAllies />
+          <Ecosystem />
           <BenefitsBanks />
           <CTASection />
         </main>

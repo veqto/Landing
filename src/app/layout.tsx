@@ -9,6 +9,10 @@ const nunito = Nunito({
   display: "swap",
 });
 
+// Dominio canonico: https://veqto.ai (NO .com). metadataBase resuelve URLs
+// relativas de OG/twitter images automaticamente.
+const SITE_URL = "https://veqto.ai";
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -17,11 +21,13 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Veqto | Crédito Vehicular Inteligente en Colombia",
   description:
-    "Veqto: el orquestador de crédito vehicular que conecta clientes, aliados comerciales, concesionarios y bancos en Colombia. Financiamiento rápido, seguro y 100% digital. Pre-aprobación en menos de 5 minutos.",
+    "Facilita tu crédito vehicular con herramientas inteligentes basadas en IA. Somos el aliado que conecta concesionarios, empresas y entidades financieras para ofrecerte el mejor camino hacia tu vehículo, de forma rápida, segura y sin complicaciones.",
   keywords: [
     "crédito vehicular",
+    "facilitador de crédito vehicular",
     "crédito vehicular Colombia",
     "financiamiento auto",
     "fintech Colombia",
@@ -30,27 +36,37 @@ export const metadata: Metadata = {
     "concesionario de carros",
     "crédito digital",
     "Veqto",
-    "pre-aprobación crédito",
+    "multi-banco crédito vehicular",
     "financiamiento vehículos",
   ],
-  authors: [{ name: "Veqto" }],
-  creator: "Veqto",
+  authors: [{ name: "Veqto S.A.S." }],
+  creator: "Veqto S.A.S.",
+  publisher: "Veqto S.A.S.",
   openGraph: {
     title: "Veqto | Crédito Vehicular Inteligente en Colombia",
     description:
-      "Conectamos clientes, aliados comerciales, concesionarios y bancos para financiar tu próximo vehículo de forma rápida y segura. Pre-aprobación en minutos.",
+      "Facilita tu crédito vehicular con herramientas inteligentes basadas en IA. Somos el aliado que conecta concesionarios, empresas y entidades financieras para ofrecerte el mejor camino hacia tu vehículo, de forma rápida, segura y sin complicaciones.",
     type: "website",
     locale: "es_CO",
     alternateLocale: "en_US",
     siteName: "Veqto",
-    url: "https://veqto.com",
+    url: SITE_URL,
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Veqto - Crédito Vehicular Inteligente",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Veqto | Crédito Vehicular Inteligente",
     description:
-      "Financiamiento de vehículos rápido, seguro y 100% digital en Colombia",
+      "Facilita tu crédito vehicular con herramientas inteligentes basadas en IA. El aliado que conecta concesionarios, empresas y entidades financieras.",
     creator: "@veqto",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -64,8 +80,33 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://veqto.com",
+    canonical: SITE_URL,
+    languages: {
+      "es-CO": SITE_URL,
+      "en-US": `${SITE_URL}/en`,
+    },
   },
+};
+
+// Structured data Schema.org: Organization + FinancialService
+// (JSON-LD inyectado en el body para visibilidad de motores de busqueda)
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": ["Organization", "FinancialService"],
+  name: "Veqto S.A.S.",
+  url: SITE_URL,
+  logo: `${SITE_URL}/logos/Logo-veqto-Positivo.svg`,
+  description:
+    "Facilitador de crédito vehicular que conecta clientes, concesionarios, aliados comerciales y entidades financieras en Colombia.",
+  taxID: "902.051.244-0",
+  address: {
+    "@type": "PostalAddress",
+    addressCountry: "CO",
+    addressLocality: "Bogotá",
+  },
+  areaServed: { "@type": "Country", name: "Colombia" },
+  serviceType: "Crédito vehicular",
+  sameAs: [],
 };
 
 export default function RootLayout({
@@ -73,9 +114,23 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // data-scroll-behavior="smooth": en Next 16 el router ya no neutraliza
+  // `scroll-behavior: smooth` durante las transiciones de ruta. Sin este
+  // atributo, ir a /acceder o a una legal se animaría como un scroll largo.
+  // Con él la navegación vuelve a ser instantánea y el scroll suave queda
+  // solo para los anchors internos del navbar.
   return (
-    <html lang="es" className={`${nunito.variable} h-full antialiased scroll-smooth`}>
+    <html
+      lang="es"
+      data-scroll-behavior="smooth"
+      className={`${nunito.variable} h-full antialiased scroll-smooth`}
+    >
       <body className="min-h-full flex flex-col bg-cream text-negro font-nunito">
+        {/* JSON-LD structured data para SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
         {children}
       </body>
     </html>

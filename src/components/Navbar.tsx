@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useRouter, usePathname } from "next/navigation";
 import { useTranslation } from "@/i18n/LanguageContext";
 import { useModal } from "@/components/ModalContext";
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
-import Button from "@/components/ui/Button";
 import AccessButton from "@/components/ui/AccessButton";
 import { cn } from "@/lib/utils";
 
@@ -17,11 +16,17 @@ interface NavLink {
 
 const Navbar: React.FC = () => {
   const { t } = useTranslation();
+  const { openCreditModal } = useModal();
   const router = useRouter();
   const pathname = usePathname();
-  const { openCreditModal } = useModal();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const reduced = useReducedMotion() ?? false;
+
+  // En rutas no-home (acceder, legales, etc.) el body es bg-cream → el navbar
+  // necesita fondo sólido desde el inicio para que el logo y los links sean legibles.
+  const isHome = pathname === "/";
+  const hasSolidBg = isScrolled || !isHome;
 
   const navLinks: NavLink[] = [
     { label: t.navbar.home, href: "#inicio" },
@@ -29,7 +34,6 @@ const Navbar: React.FC = () => {
     { label: t.navbar.creditFlow, href: "#proceso" },
     { label: t.navbar.benefits, href: "#beneficios" },
     { label: t.navbar.simulator, href: "#simulador" },
-    { label: t.navbar.cta, href: "#contacto" },
   ];
 
   useEffect(() => {
@@ -62,8 +66,9 @@ const Navbar: React.FC = () => {
     }
   };
 
+  // Con reduced-motion todo entra por opacidad, sin desplazamiento ni cascada.
   const navbarVariants = {
-    hidden: { opacity: 0, y: -20 },
+    hidden: reduced ? { opacity: 0 } : { opacity: 0, y: -20 },
     visible: {
       opacity: 1,
       y: 0,
@@ -72,26 +77,24 @@ const Navbar: React.FC = () => {
   };
 
   const menuVariants = {
-    hidden: { opacity: 0, y: -20 },
+    hidden: reduced ? { opacity: 0 } : { opacity: 0, y: -20 },
     visible: {
       opacity: 1,
       y: 0,
       transition: { duration: 0.3 },
     },
-    exit: {
-      opacity: 0,
-      y: -20,
-      transition: { duration: 0.3 },
-    },
+    exit: reduced
+      ? { opacity: 0, transition: { duration: 0.2 } }
+      : { opacity: 0, y: -20, transition: { duration: 0.3 } },
   };
 
   const linkVariants = {
-    hidden: { opacity: 0, x: -10 },
+    hidden: reduced ? { opacity: 0 } : { opacity: 0, x: -10 },
     visible: (i: number) => ({
       opacity: 1,
       x: 0,
       transition: {
-        delay: i * 0.05,
+        delay: reduced ? 0 : i * 0.05,
         duration: 0.3,
       },
     }),
@@ -104,8 +107,8 @@ const Navbar: React.FC = () => {
       variants={navbarVariants}
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isScrolled
-          ? "bg-negro/80 backdrop-blur-md border-b border-white/10 shadow-lg"
+        hasSolidBg
+          ? "bg-negro/90 backdrop-blur-md border-b border-white/10 shadow-lg"
           : "bg-transparent"
       )}
       role="navigation"
@@ -117,8 +120,8 @@ const Navbar: React.FC = () => {
           <motion.a
             href="#inicio"
             onClick={(e) => handleSmoothScroll(e, "#inicio")}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={reduced ? undefined : { scale: 1.05 }}
+            whileTap={reduced ? undefined : { scale: 0.95 }}
             className="flex items-center cursor-pointer"
             aria-label="Veqto - Ir al inicio"
           >
@@ -147,21 +150,21 @@ const Navbar: React.FC = () => {
             ))}
           </div>
 
-          {/* Right Side */}
+          {/* Right Side — el diseño aprobado reintroduce "Solicitar Crédito"
+              en el navbar como outline claro, junto al acceso a plataforma. */}
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="hidden sm:block">
               <LanguageSwitcher />
             </div>
 
-            <Button
-              variant="secondary"
-              size="sm"
-              className="hidden lg:inline-flex text-xs sm:text-sm border-white/70 text-white hover:bg-white hover:text-negro"
-              aria-label={t.navbar.cta}
+            <motion.button
               onClick={openCreditModal}
+              whileHover={reduced ? undefined : { scale: 1.05 }}
+              whileTap={reduced ? undefined : { scale: 0.98 }}
+              className="hidden lg:inline-flex items-center justify-center rounded-full border-2 border-white/70 px-4 py-2 text-xs sm:text-sm font-semibold text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-negro"
             >
               {t.navbar.cta}
-            </Button>
+            </motion.button>
 
             <AccessButton
               label={t.access.navButton}
@@ -173,8 +176,8 @@ const Navbar: React.FC = () => {
             <motion.button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={reduced ? undefined : { scale: 1.1 }}
+              whileTap={reduced ? undefined : { scale: 0.95 }}
               aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
               aria-expanded={isMenuOpen}
               aria-controls="mobile-menu"
@@ -227,23 +230,23 @@ const Navbar: React.FC = () => {
                 ))}
 
                 <div className="border-t border-white/10 my-2 pt-3 flex flex-col gap-3">
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      openCreditModal();
+                    }}
+                    className="w-full rounded-full border-2 border-white/70 px-4 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-negro"
+                  >
+                    {t.navbar.cta}
+                  </button>
+
                   <AccessButton
                     label={t.access.navButton}
                     size="sm"
                     className="w-full text-sm"
                     onClick={() => setIsMenuOpen(false)}
                   />
-                  <div className="flex gap-2 items-center justify-between">
-                    <LanguageSwitcher />
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="flex-1 text-xs border-white/70 text-white hover:bg-white hover:text-negro"
-                      onClick={() => { setIsMenuOpen(false); openCreditModal(); }}
-                    >
-                      {t.navbar.cta}
-                    </Button>
-                  </div>
+                  <LanguageSwitcher />
                 </div>
               </div>
             </motion.div>

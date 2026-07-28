@@ -1,5 +1,17 @@
 export type Locale = "es" | "en";
 
+/**
+ * Fragmento de un titular con resaltado explícito.
+ *
+ * Los segmentos se concatenan literalmente al renderizar, así que los espacios
+ * de separación deben ir dentro del `text`. Sustituye al esquema anterior de
+ * `highlightWords`, que hacía match por substring y resaltaba de más en EN.
+ */
+export type TitleSegment = {
+  text: string;
+  highlight?: boolean;
+};
+
 export type Translations = {
   navbar: {
     home: string;
@@ -10,39 +22,54 @@ export type Translations = {
     cta: string;
   };
   hero: {
-    title: string;
-    highlightWords: string[];
+    titleSegments: TitleSegment[];
     subtitle: string;
-    cta1: string;
-    cta2: string;
-    tagline: string;
-    scrollText: string;
+    /** Párrafo de apoyo; el segmento resaltado se renderiza en negrita, no en verde. */
+    intro: TitleSegment[];
+    /** CTA naranja de conversión: abre CreditRequestModal. */
+    ctaPrimary: string;
+    /** CTA outline claro: hace scroll a la sección de pasos (#proceso). */
+    ctaSecondary: string;
+    imageAlt: string;
   };
-  whatIs: {
+  problem: {
     title: string;
+    intro: string;
+    items: string[];
+  };
+  solution: {
+    titleTop: string;
+    titleBottom: string;
     description: string;
-    features: Array<{
+    cards: Array<{
       title: string;
       description: string;
     }>;
+    imageAlt: string;
+  };
+  whyVeqto: {
+    titleSegments: TitleSegment[];
+    items: string[];
   };
   creditFlow: {
-    title: string;
-    subtitle?: string;
+    titleSegments: TitleSegment[];
     steps: {
       [key: string]: {
         title: string;
         description: string;
       };
     };
+    imageAlt: string;
   };
-  benefitsAllies: {
-    title: string;
-    subtitle: string;
-    items: Array<{
+  ecosystem: {
+    titleSegments: TitleSegment[];
+    cards: Array<{
       title: string;
       description: string;
     }>;
+    /** Enlace dentro de la tarjeta de aliados; abre AllyRegistrationModal. */
+    allyCta: string;
+    imageAlt: string;
   };
   benefitsBanks: {
     title: string;
@@ -54,7 +81,7 @@ export type Translations = {
     trustStatement: string;
   };
   simulator: {
-    title: string;
+    titleSegments: TitleSegment[];
     vehiclePrice: string;
     downPayment: string;
     downPaymentLabel: string;
@@ -71,9 +98,8 @@ export type Translations = {
   cta: {
     title: string;
     subtitle: string;
-    button1: string;
-    button2: string;
-    trustBadge: string;
+    /** Único botón del cierre: naranja, abre CreditRequestModal. */
+    button: string;
   };
   access: {
     navButton: string;
@@ -119,115 +145,130 @@ export const translations: Record<Locale, Translations> = {
   es: {
     navbar: {
       home: "Inicio",
-      about: "Qué es Veqto",
-      creditFlow: "Flujo de Crédito",
+      about: "¿Qué es?",
+      creditFlow: "¿Cómo funciona?",
       benefits: "Beneficios",
       simulator: "Simulador",
       cta: "Solicitar Crédito",
     },
     hero: {
-      title: "Crédito Vehicular Inteligente",
-      highlightWords: ["Crédito", "Vehicular", "Inteligente"],
+      titleSegments: [{ text: "EL CRÉDITO VEHICULAR, SIN VUELTAS" }],
       subtitle:
-        "Conectamos clientes, concesionarios y bancos para financiar tu próximo vehículo de forma rápida, segura y transparente en Colombia.",
-      cta1: "Solicitar Crédito",
-      cta2: "Soy Aliado Comercial",
-      tagline: "Crédito vehicular inteligente para Colombia",
-      scrollText: "Descubre más",
+        "Compara, elige y obtén la mejor financiación para tu vehículo desde un solo lugar.",
+      intro: [
+        { text: "Veqto conecta", highlight: true },
+        {
+          text: " clientes, concesionarios y entidades financieras para hacer que el proceso de crédito sea transparente, rápido y sin fricciones.",
+        },
+      ],
+      ctaPrimary: "Solicitar Financiación",
+      ctaSecondary: "Conocer cómo funciona",
+      imageAlt:
+        "Cliente junto a su vehículo con el estudio de crédito Veqto aprobado",
     },
-    whatIs: {
-      title: "¿Qué es Veqto?",
+    problem: {
+      title: "Conseguir un crédito vehicular no debería ser complicado",
+      intro: "Hoy comprar un vehículo implica:",
+      items: [
+        "Llenar formularios varias veces.",
+        "Esperar respuestas de diferentes bancos.",
+        "No saber cuál oferta es realmente la mejor.",
+        "Perder tiempo entre concesionarios y trámites.",
+      ],
+    },
+    solution: {
+      titleTop: "Un solo proceso",
+      titleBottom: "Múltiples entidades financieras.",
       description:
-        "Veqto es el orquestador de crédito vehicular que conecta clientes, aliados comerciales y concesionarios con bancos en Colombia. Hacemos que el financiamiento sea transparente, eficiente y sin fricciones.",
-      features: [
+        "Con Veqto centralizas todo el proceso en una sola plataforma.",
+      cards: [
         {
-          title: "Proceso 100% Digital",
+          title: "Compara opciones",
           description:
-            "Sin papeleos ni trámites presenciales. Todo desde tu celular o computador.",
+            "Accede a diferentes entidades financieras desde un solo lugar.",
         },
         {
-          title: "Aprobación Rápida",
+          title: "Más transparencia",
           description:
-            "Pre-aprobación en menos de 5 minutos con scoring de IA avanzado.",
+            "Conoce las condiciones y toma decisiones con información clara.",
         },
         {
-          title: "Multi-Banco",
+          title: "Respuestas más rápidas",
           description:
-            "Conectamos con múltiples entidades financieras para encontrar la mejor tasa para ti.",
+            "Menos trámites y más agilidad para avanzar hacia tu vehículo.",
         },
         {
-          title: "Red de Aliados",
-          description:
-            "Aliados comerciales y concesionarios conectados en todo Colombia.",
+          title: "Acompañamiento",
+          description: "Te guiamos durante todo el proceso.",
         },
-        {
-          title: "Rápido y Eficiente",
-          description:
-            "Reduce el tiempo de aprobación de semanas a horas con nuestra tecnología.",
-        },
-        {
-          title: "Crece con Nosotros",
-          description:
-            "Métricas en tiempo real y herramientas para escalar tu negocio.",
-        },
+      ],
+      imageAlt:
+        "Persona consultando el avance de su solicitud de crédito en la app de Veqto",
+    },
+    whyVeqto: {
+      titleSegments: [
+        { text: "¿Por qué elegir " },
+        { text: "Veqto", highlight: true },
+        { text: "?" },
+      ],
+      items: [
+        "Más opciones de financiación",
+        "Un proceso más rápido",
+        "Transparencia en cada paso",
+        "Todo en un solo lugar",
       ],
     },
     creditFlow: {
-      title: "¿Cómo funciona?",
-      subtitle: "Así te ayudamos a avanzar",
+      titleSegments: [
+        { text: "Obtener tu crédito " },
+        { text: "es más fácil de lo que imaginas", highlight: true },
+      ],
       steps: {
         "1": {
-          title: "Entendemos tu perfil",
-          description:
-            "No todos los bancos prestan igual. Analizamos tu caso antes de mostrar opciones.",
+          title: "Cuéntanos qué vehículo buscas",
+          description: "Nuevo o usado.",
         },
         "2": {
-          title: "Ordenamos las mejores alternativas",
+          title: "Analizamos tu perfil",
           description:
-            "Hacemos competir a los bancos y traducimos el crédito a lenguaje claro.",
+            "Conectamos tu solicitud con las entidades financieras.",
         },
         "3": {
-          title: "Te acompañamos hasta decidir bien",
+          title: "Recibes las mejores opciones",
+          description: "Compara tasas, plazos y condiciones.",
+        },
+        "4": {
+          title: "Elige y estrena",
           description:
-            "No firmas a ciegas ni pierdes tiempo. Avanzas con seguridad.",
+            "Nos encargamos de que el proceso sea simple y transparente.",
         },
       },
+      imageAlt: "Clienta celebrando con las llaves de su vehículo nuevo",
     },
-    benefitsAllies: {
-      title: "Beneficios para Aliados",
-      subtitle: "Más ventas, procesos ágiles y herramientas digitales para tu negocio",
-      items: [
+    ecosystem: {
+      titleSegments: [
+        { text: "La plataforma que conecta a todo el " },
+        { text: "ecosistema automotor", highlight: true },
+      ],
+      cards: [
         {
-          title: "Más Ventas",
+          title: "Para concesionarios",
           description:
-            "Acceso a más clientes con capacidad de compra a través de nuestra plataforma de financiamiento.",
+            "Aumenta cierres y agiliza la aprobación de créditos.",
         },
         {
-          title: "Proceso Ágil",
+          title: "Para aliados comerciales",
           description:
-            "Aprobaciones rápidas que permiten cerrar ventas en menos tiempo sin papeleo.",
+            "Gestiona oportunidades y da seguimiento a tus clientes.",
         },
         {
-          title: "Sin Costo",
+          title: "Para entidades financieras",
           description:
-            "Integración sin comisiones ocultas. Modelo transparente y justo para tu negocio.",
-        },
-        {
-          title: "Gestión Digital",
-          description:
-            "Portal completo para gestionar solicitudes y documentación de forma eficiente.",
-        },
-        {
-          title: "Reportes en Tiempo Real",
-          description:
-            "Seguimiento detallado de cada transacción y estado de créditos al instante.",
-        },
-        {
-          title: "Soporte Dedicado",
-          description:
-            "Equipo especializado para resolver dudas y optimizar tus resultados de venta.",
+            "Recibe solicitudes estructuradas y optimiza la colocación de crédito.",
         },
       ],
+      allyCta: "Quiero ser aliado",
+      imageAlt: "Asesor de concesionario atendiendo a un cliente",
     },
     benefitsBanks: {
       title: "Beneficios para Bancos",
@@ -268,7 +309,11 @@ export const translations: Record<Locale, Translations> = {
         "Veqto es tu aliado tecnológico para expandir tu cartera de crédito vehicular con confianza y resultados mensurables.",
     },
     simulator: {
-      title: "Simulador de Crédito",
+      titleSegments: [
+        { text: "Simula " },
+        { text: "tu crédito", highlight: true },
+        { text: " en segundos" },
+      ],
       vehiclePrice: "Precio del Vehículo",
       downPayment: "Cuota Inicial",
       downPaymentLabel: "% del precio",
@@ -284,13 +329,11 @@ export const translations: Record<Locale, Translations> = {
       ctaButton: "¿Listo? Solicita tu crédito real",
     },
     cta: {
-      title: "¿Listo para transformar tu negocio?",
+      title:
+        "Más que una plataforma, un facilitador de crédito vehicular.",
       subtitle:
-        "Únete a la revolución del crédito vehicular en Colombia. Acelera tus ventas, simplifica tu operación y crece con Veqto.",
-      button1: "Solicitar Crédito",
-      button2: "Ser Aliado Comercial",
-      trustBadge:
-        "La plataforma de crédito vehicular más innovadora de Colombia",
+        "Veqto conecta a todos los actores del proceso para que la financiación deje de ser un obstáculo y se convierta en una experiencia simple, eficiente y transparente.",
+      button: "Solicitar Financiación",
     },
     access: {
       navButton: "Acceder a la plataforma",
@@ -344,7 +387,7 @@ export const translations: Record<Locale, Translations> = {
         { label: "Autorización de Datos", href: "/autorizacion-datos" },
       ],
       contact: "Contacto",
-      email: "contacto@veqto.co",
+      email: "contacto@veqto.ai",
       address: "Cr 15 No. 93 A - 84 Of 413, Bogotá D.C.",
       copyright: "© 2026 Veqto S.A.S. NIT 902.051.244-0. Todos los derechos reservados.",
     },
@@ -364,115 +407,129 @@ export const translations: Record<Locale, Translations> = {
   en: {
     navbar: {
       home: "Home",
-      about: "About Veqto",
-      creditFlow: "Credit Flow",
+      about: "What is it?",
+      creditFlow: "How it works",
       benefits: "Benefits",
       simulator: "Simulator",
       cta: "Apply for Credit",
     },
     hero: {
-      title: "Smart Vehicle Credit",
-      highlightWords: ["Smart", "Vehicle", "Credit"],
+      titleSegments: [{ text: "CAR FINANCING, NO RUNAROUND" }],
       subtitle:
-        "We connect customers, dealers and banks to finance your next vehicle quickly, securely and transparently in Colombia.",
-      cta1: "Apply for Credit",
-      cta2: "I'm a Commercial Partner",
-      tagline: "Smart vehicle financing for Colombia",
-      scrollText: "Discover more",
+        "Compare, choose and get the best financing for your vehicle, all in one place.",
+      intro: [
+        { text: "Veqto connects", highlight: true },
+        {
+          text: " customers, dealerships and financial institutions to make the credit process transparent, fast and frictionless.",
+        },
+      ],
+      ctaPrimary: "Request Financing",
+      ctaSecondary: "See how it works",
+      imageAlt:
+        "Customer next to their vehicle with an approved Veqto credit assessment",
     },
-    whatIs: {
-      title: "What is Veqto?",
+    problem: {
+      title: "Getting a car loan shouldn't be complicated",
+      intro: "Today, buying a vehicle means:",
+      items: [
+        "Filling out the same forms over and over.",
+        "Waiting on answers from different banks.",
+        "Not knowing which offer is really the best.",
+        "Losing time between dealerships and paperwork.",
+      ],
+    },
+    solution: {
+      titleTop: "One process",
+      titleBottom: "Multiple financial institutions.",
       description:
-        "Veqto is the vehicle credit orchestrator that connects customers, car dealerships and banks in Colombia. We make financing transparent, efficient and frictionless.",
-      features: [
+        "With Veqto you centralize the entire process in a single platform.",
+      cards: [
         {
-          title: "100% Digital Process",
+          title: "Compare options",
           description:
-            "No paperwork or in-person procedures. Everything from your phone or computer.",
+            "Reach different financial institutions from a single place.",
         },
         {
-          title: "Fast Approval",
+          title: "More transparency",
           description:
-            "Pre-approval in less than 5 minutes with advanced AI scoring.",
+            "Know the conditions and make decisions with clear information.",
         },
         {
-          title: "Multi-Bank",
+          title: "Faster answers",
           description:
-            "We connect with multiple financial institutions to find the best rate for you.",
+            "Less paperwork and more speed on the way to your vehicle.",
         },
         {
-          title: "Partner Network",
-          description:
-            "Dealerships and car lots connected throughout Colombia.",
+          title: "Guidance",
+          description: "We guide you through the entire process.",
         },
-        {
-          title: "Fast & Efficient",
-          description:
-            "Reduce approval time from weeks to hours with our technology.",
-        },
-        {
-          title: "Grow With Us",
-          description:
-            "Real-time metrics and tools to scale your business.",
-        },
+      ],
+      imageAlt:
+        "Person checking the progress of their credit application in the Veqto app",
+    },
+    whyVeqto: {
+      titleSegments: [
+        { text: "Why choose " },
+        { text: "Veqto", highlight: true },
+        { text: "?" },
+      ],
+      items: [
+        "More financing options",
+        "A faster process",
+        "Transparency at every step",
+        "Everything in one place",
       ],
     },
     creditFlow: {
-      title: "How does it work?",
-      subtitle: "This is how we help you move forward",
+      titleSegments: [
+        { text: "Getting your loan " },
+        { text: "is easier than you think", highlight: true },
+      ],
       steps: {
         "1": {
-          title: "We understand your profile",
-          description:
-            "Not all banks lend the same way. We analyze your case before showing options.",
+          title: "Tell us which vehicle you want",
+          description: "New or used.",
         },
         "2": {
-          title: "We sort the best alternatives",
+          title: "We analyze your profile",
           description:
-            "We make banks compete and translate the credit into clear language.",
+            "We connect your application with the financial institutions.",
         },
         "3": {
-          title: "We accompany you to decide well",
+          title: "You get the best options",
+          description: "Compare rates, terms and conditions.",
+        },
+        "4": {
+          title: "Choose and drive away",
           description:
-            "You don't sign blindly nor waste time. You move forward confidently.",
+            "We make sure the process stays simple and transparent.",
         },
       },
+      imageAlt: "Customer celebrating with the keys to her new vehicle",
     },
-    benefitsAllies: {
-      title: "Benefits for Partners",
-      subtitle: "More sales, agile processes, and digital tools for your dealership",
-      items: [
+    ecosystem: {
+      titleSegments: [
+        { text: "The platform that connects the entire " },
+        { text: "automotive ecosystem", highlight: true },
+      ],
+      cards: [
         {
-          title: "More Sales",
-          description:
-            "Access to more customers with purchasing power through our financing platform.",
+          title: "For dealerships",
+          description: "Close more sales and speed up credit approvals.",
         },
         {
-          title: "Agile Process",
+          title: "For commercial partners",
           description:
-            "Fast approvals that allow you to close sales in less time without paperwork.",
+            "Manage opportunities and follow up with your clients.",
         },
         {
-          title: "No Cost",
+          title: "For financial institutions",
           description:
-            "Integration without hidden commissions. Transparent and fair model for your business.",
-        },
-        {
-          title: "Digital Management",
-          description:
-            "Complete portal to manage requests and documentation efficiently.",
-        },
-        {
-          title: "Real-time Reports",
-          description:
-            "Detailed tracking of each transaction and instant credit status.",
-        },
-        {
-          title: "Dedicated Support",
-          description:
-            "Specialized team to resolve questions and optimize your sales results.",
+            "Receive structured applications and optimize credit placement.",
         },
       ],
+      allyCta: "I want to be a partner",
+      imageAlt: "Dealership advisor assisting a customer",
     },
     benefitsBanks: {
       title: "Benefits for Banks",
@@ -513,7 +570,11 @@ export const translations: Record<Locale, Translations> = {
         "Veqto is your technology partner to expand your vehicle credit portfolio with confidence and measurable results.",
     },
     simulator: {
-      title: "Credit Simulator",
+      titleSegments: [
+        { text: "Simulate " },
+        { text: "your loan", highlight: true },
+        { text: " in seconds" },
+      ],
       vehiclePrice: "Vehicle Price",
       downPayment: "Down Payment",
       downPaymentLabel: "% of price",
@@ -529,13 +590,10 @@ export const translations: Record<Locale, Translations> = {
       ctaButton: "Ready? Apply for real credit",
     },
     cta: {
-      title: "Ready to transform your business?",
+      title: "More than a platform — a car financing enabler.",
       subtitle:
-        "Join the vehicle credit revolution in Colombia. Accelerate your sales, simplify your operation and grow with Veqto.",
-      button1: "Apply for Credit",
-      button2: "Become a Partner",
-      trustBadge:
-        "Colombia's most innovative vehicle credit platform",
+        "Veqto connects every player in the process so that financing stops being an obstacle and becomes a simple, efficient and transparent experience.",
+      button: "Request Financing",
     },
     access: {
       navButton: "Access the platform",
@@ -589,7 +647,7 @@ export const translations: Record<Locale, Translations> = {
         { label: "Data Authorization", href: "/autorizacion-datos" },
       ],
       contact: "Contact",
-      email: "contacto@veqto.co",
+      email: "contacto@veqto.ai",
       address: "Cr 15 No. 93 A - 84 Of 413, Bogotá D.C.",
       copyright: "© 2026 Veqto S.A.S. NIT 902.051.244-0. All rights reserved.",
     },
