@@ -102,6 +102,12 @@ export const solicitudes = pgTable('solicitudes', {
   capacidadPago: numeric('capacidad_pago', { precision: 15, scale: 2 }),
   multiploIngreso: numeric('multiplo_ingreso', { precision: 5, scale: 2 }),
   origenCliente: origenClienteEnum('origen_cliente'),
+  /**
+   * Datos que la landing recoge pero que no tienen columna propia: el rango de
+   * ingresos y el historial crediticio del simulador, más las etiquetas crudas
+   * antes de normalizarlas a los enums. Se guardan para no perder nada del lead.
+   */
+  metadatosLanding: jsonb('metadatos_landing').$type<Record<string, unknown>>(),
   ipSolicitud: text('ip_solicitud'),
   userAgent: text('user_agent'),
   firmaDigital: text('firma_digital'),

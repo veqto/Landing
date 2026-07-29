@@ -44,18 +44,23 @@ const CONSENT_TEXT = {
 /** Mensaje al titular según por qué falló el envío. */
 function errorMessage(failure: CreditApplicationFailure, es: boolean): string {
   switch (failure.kind) {
-    case 'not_configured':
-      return es
-        ? 'El envío de solicitudes no está disponible en este momento. Escríbenos y te ayudamos a completar tu solicitud.'
-        : 'Application submission is unavailable right now. Contact us and we will help you complete your application.';
     case 'validation':
       return es
         ? 'Algunos datos no pasaron la validación. Revisa la información e inténtalo de nuevo.'
         : 'Some of your details did not pass validation. Please review them and try again.';
-    case 'rate_limited':
+    case 'rate_limited': {
+      const min = failure.retryAfterSeconds
+        ? Math.max(1, Math.ceil(failure.retryAfterSeconds / 60))
+        : null;
+      if (min) {
+        return es
+          ? `Recibimos demasiadas solicitudes desde aquí. Vuelve a intentarlo en ${min} ${min === 1 ? 'minuto' : 'minutos'}.`
+          : `Too many requests from here. Try again in ${min} ${min === 1 ? 'minute' : 'minutes'}.`;
+      }
       return es
         ? 'Recibimos demasiadas solicitudes desde aquí. Espera un momento y vuelve a intentarlo.'
         : 'Too many requests from here. Please wait a moment and try again.';
+    }
     case 'forbidden':
       return es
         ? 'No pudimos verificar que eres una persona. Vuelve a intentarlo.'
