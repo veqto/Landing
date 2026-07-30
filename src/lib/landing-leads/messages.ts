@@ -43,6 +43,22 @@ export function leadErrorMessage(failure: LeadFailure, es: boolean): string {
 }
 
 /**
+ * Campos cuyo nombre en el contrato no coincide con el que usa el formulario.
+ *
+ * El contrato habla de `aceptaTratamientoDatos` (Ley 1581), pero los dos
+ * formularios de varios pasos guardan ese checkbox como `autorizaDatos` y pintan
+ * su error con esa clave. Sin este alias, un 422 sobre la autorización de datos
+ * mostraría el banner general pero ninguna marca junto al checkbox.
+ *
+ * Hoy la validación local ya exige el checkbox, así que ese 422 no debería
+ * llegar nunca — pero "no debería llegar" no es razón para perder el mensaje si
+ * llega.
+ */
+const ALIAS_CAMPOS: Record<string, string> = {
+  aceptaTratamientoDatos: 'autorizaDatos',
+};
+
+/**
  * Traduce los `campos` de un 422 a las claves planas que usan los formularios
  * de varios pasos (`consentimientos.aceptaTerminos` → `aceptaTerminos`), para
  * poder pintar el error junto al campo que lo causó.
@@ -54,7 +70,8 @@ export function aplanarFieldErrors(
   const plano: Record<string, string> = {};
   for (const [ruta, mensaje] of Object.entries(fieldErrors)) {
     const hoja = ruta.includes('.') ? ruta.slice(ruta.lastIndexOf('.') + 1) : ruta;
-    if (!plano[hoja]) plano[hoja] = mensaje;
+    const clave = ALIAS_CAMPOS[hoja] ?? hoja;
+    if (!plano[clave]) plano[clave] = mensaje;
   }
   return plano;
 }

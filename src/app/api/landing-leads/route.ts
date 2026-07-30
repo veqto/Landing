@@ -7,9 +7,11 @@
  * │ paralela de la landing. Este archivo solo existe para poder desarrollar  │
  * │ y probar los formularios sin depender de la plataforma.                  │
  * │                                                                          │
- * │ NUNCA corre en producción: el guard de abajo devuelve 404 si             │
- * │ NODE_ENV === 'production'. En producción el cliente apunta a             │
- * │ NEXT_PUBLIC_LANDING_LEADS_BASE_URL y esta ruta no se usa.                │
+ * │ NUNCA responde salvo en desarrollo local y a propósito: el guard exige   │
+ * │ NODE_ENV !== 'production' Y LANDING_LEADS_MOCK=1. Es decir:              │
+ * │     LANDING_LEADS_MOCK=1 npm run dev                                     │
+ * │ En producción el cliente apunta a NEXT_PUBLIC_LANDING_LEADS_BASE_URL y   │
+ * │ esta ruta devuelve 404.                                                  │
  * │                                                                          │
  * │ NO TOCA LA BASE DE DATOS. Guarda en memoria del proceso y se vacía en    │
  * │ cada reinicio. La landing no configura DATABASE_URL ni aplica            │
@@ -71,12 +73,31 @@ function ipDe(request: Request): string | null {
   return request.headers.get('x-real-ip');
 }
 
+/**
+ * Doble condición para que el mock responda: fuera de producción Y habilitado a
+ * mano. Las dos son necesarias.
+ *
+ * El `NODE_ENV` solo no basta: un preview de Vercel o un `next start` local
+ * corren en modo producción, pero un runner de CI o un contenedor mal
+ * configurado pueden no hacerlo. El opt-in explícito es lo que garantiza que el
+ * mock nunca responda por accidente en un entorno que no sea el de alguien
+ * desarrollando a propósito.
+ */
+function mockHabilitado(): boolean {
+  return process.env.NODE_ENV !== 'production' && process.env.LANDING_LEADS_MOCK === '1';
+}
+
 export async function POST(request: Request): Promise<Response> {
-  // ─── GUARD: este mock no existe en producción ───────────────────────────
+  // ─── GUARD: este mock no existe fuera del desarrollo local ──────────────
   // Se comprueba antes que nada. Si alguien despliega la landing sin apuntar el
   // cliente a la plataforma, el formulario falla de forma visible en vez de
   // aceptar leads que nadie va a ver.
-  if (process.env.NODE_ENV === 'production') {
+  if (!mockHabilitado()) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(
+        '[landing-leads:mock] 404 — el mock está apagado. Para desarrollo local: LANDING_LEADS_MOCK=1 npm run dev'
+      );
+    }
     return new Response(null, { status: 404 });
   }
 

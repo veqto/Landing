@@ -12,8 +12,10 @@ Endpoint que recibe los tres formularios de la landing pública.
 >   compartidos por el cliente y el mock, de modo que una desalineación rompe la
 >   compilación en vez de fallar en producción.
 > - `src/app/api/landing-leads/route.ts` — un **mock de desarrollo**. Implementa
->   el contrato completo en memoria, **no toca ninguna base** y devuelve 404 si
->   `NODE_ENV === 'production'`.
+>   el contrato completo en memoria, **no toca ninguna base** y devuelve 404
+>   salvo que se cumplan las dos condiciones: `NODE_ENV !== 'production'` **y**
+>   `LANDING_LEADS_MOCK=1`. Para levantarlo:
+>   `LANDING_LEADS_MOCK=1 npm run dev`
 >
 > La landing **no** configura `DATABASE_URL` ni aplica migraciones.
 
@@ -203,6 +205,7 @@ Es el primer sitio donde mirar si los formularios fallan tras el despliegue.
 |---|---|---|---|
 | `NEXT_PUBLIC_LANDING_LEADS_BASE_URL` | navegador | **sí, en producción** | `https://app.veqto.ai`. Sin ella el cliente no envía y muestra error |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | navegador | no | Site key para pintar el widget |
+| `LANDING_LEADS_MOCK` | servidor | no | `1` habilita el mock local. **Nunca en Vercel** |
 
 `DATABASE_URL` **no se configura en la landing**. No hay build ni runtime que la
 necesite: el cliente Drizzle es perezoso y ningún camino de la app lo invoca.
@@ -236,9 +239,10 @@ CORS de una caída de red.
   llegan los componentes por separado.
 - `cuotaInicial` / `cuotaInicialPorcentaje` es un **porcentaje**, no un monto.
 
-`docs/referencia-ddl-plataforma.sql` tiene el DDL que se había escrito cuando el
-endpoint iba a vivir aquí. **No se aplica a ninguna base desde este repo**; queda
-como referencia del modelo de idempotencia y de los campos extra del lead.
+`db/migrations/001_landing_leads.sql` tiene el DDL que se había escrito cuando el
+endpoint iba a vivir aquí. Lleva una cabecera **NO APLICAR** y no se aplica a
+ninguna base desde este repo; queda como referencia histórica del modelo de
+idempotencia y de los campos extra del lead.
 
 ## 10. Estado del cableado en la landing
 
