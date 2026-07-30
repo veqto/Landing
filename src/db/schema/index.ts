@@ -4,4 +4,3 @@ export * from './aliados';
 export * from './respuestas-bancos';
 export * from './bancos-catalogo';
 export * from './actividad-log';
-export * from './landing-leads';

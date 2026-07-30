@@ -7,10 +7,11 @@ import { useModal } from '@/components/ModalContext';
 import { useTranslation } from '@/i18n/LanguageContext';
 import { cn } from '@/lib/utils';
 import {
-  submitCreditApplication,
+  submitSimuladorLead,
   newIdempotencyKey,
-  type CreditApplicationFailure,
-} from '@/lib/credit-application-api';
+  type LeadFailure,
+} from '@/lib/landing-leads/client';
+import { leadErrorMessage } from '@/lib/landing-leads/messages';
 
 const STEPS = 3;
 
@@ -41,41 +42,6 @@ const CONSENT_TEXT = {
   },
 } as const;
 
-/** Mensaje al titular según por qué falló el envío. */
-function errorMessage(failure: CreditApplicationFailure, es: boolean): string {
-  switch (failure.kind) {
-    case 'validation':
-      return es
-        ? 'Algunos datos no pasaron la validación. Revisa la información e inténtalo de nuevo.'
-        : 'Some of your details did not pass validation. Please review them and try again.';
-    case 'rate_limited': {
-      const min = failure.retryAfterSeconds
-        ? Math.max(1, Math.ceil(failure.retryAfterSeconds / 60))
-        : null;
-      if (min) {
-        return es
-          ? `Recibimos demasiadas solicitudes desde aquí. Vuelve a intentarlo en ${min} ${min === 1 ? 'minuto' : 'minutos'}.`
-          : `Too many requests from here. Try again in ${min} ${min === 1 ? 'minute' : 'minutes'}.`;
-      }
-      return es
-        ? 'Recibimos demasiadas solicitudes desde aquí. Espera un momento y vuelve a intentarlo.'
-        : 'Too many requests from here. Please wait a moment and try again.';
-    }
-    case 'forbidden':
-      return es
-        ? 'No pudimos verificar que eres una persona. Vuelve a intentarlo.'
-        : 'We could not verify you are human. Please try again.';
-    case 'network':
-      return es
-        ? 'No pudimos conectar con la plataforma. Revisa tu conexión e inténtalo de nuevo.'
-        : 'We could not reach the platform. Check your connection and try again.';
-    default:
-      return es
-        ? 'Algo falló al enviar tu solicitud. Inténtalo de nuevo en unos minutos.'
-        : 'Something went wrong sending your application. Please try again in a few minutes.';
-  }
-}
-
 const CreditRequestModal: React.FC = () => {
   const { activeModal, closeModal } = useModal();
   const { locale } = useTranslation();
@@ -83,7 +49,7 @@ const CreditRequestModal: React.FC = () => {
 
   const [step, setStep] = useState(1);
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
-  const [failure, setFailure] = useState<CreditApplicationFailure | null>(null);
+  const [failure, setFailure] = useState<LeadFailure | null>(null);
   /** Referencia emitida por la plataforma. Nunca se genera localmente. */
   const [refCode, setRefCode] = useState<string | null>(null);
   /**
@@ -156,7 +122,7 @@ const CreditRequestModal: React.FC = () => {
     setStatus('submitting');
     setFailure(null);
 
-    const result = await submitCreditApplication(
+    const result = await submitSimuladorLead(
       {
         nombreCompleto: fullName.trim(),
         cedula,
@@ -578,7 +544,7 @@ const CreditRequestModal: React.FC = () => {
                   >
                     <AlertCircle size={16} className="text-red-500 mt-0.5 shrink-0" />
                     <p className="text-xs text-red-700 leading-relaxed">
-                      {errorMessage(failure, es)}
+                      {leadErrorMessage(failure, es)}
                     </p>
                   </div>
                 )}

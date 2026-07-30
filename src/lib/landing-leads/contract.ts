@@ -1,13 +1,18 @@
 /**
  * CONTRATO LANDING-LEADS — fuente única de verdad.
  *
- * Lo consumen los dos lados: el Route Handler en
- * `src/app/api/landing-leads/route.ts` y el cliente en
- * `src/lib/credit-application-api.ts`. Si un campo cambia aquí, TypeScript
+ * El endpoint definitivo lo implementa la PLATAFORMA (app.veqto.ai): los leads
+ * deben caer en la vista de Leads que usa operación. Este archivo es la
+ * especificación ejecutable de ese contrato.
+ *
+ * Lo consumen los dos lados de este repo: el cliente
+ * (`src/lib/landing-leads/client.ts`) y el mock de desarrollo
+ * (`src/app/api/landing-leads/route.ts`). Si un campo cambia aquí, TypeScript
  * rompe el lado que quede desalineado — por eso no hay un documento aparte que
  * se pueda quedar viejo.
  *
- * Endpoint: POST /api/landing-leads   (mismo origen que la landing)
+ * Endpoint: POST {NEXT_PUBLIC_LANDING_LEADS_BASE_URL}/api/landing-leads
+ * Versión legible del contrato: docs/CONTRATO-LANDING-LEADS.md
  */
 
 export const LANDING_LEADS_PATH = '/api/landing-leads';

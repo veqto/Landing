@@ -1,25 +1,26 @@
 /**
- * LANDING-LEADS — punto de entrada de los tres formularios de la landing.
+ * MOCK DE DESARROLLO de LANDING-LEADS. No es el endpoint de producción.
  *
- *   POST /api/landing-leads
+ * ┌─────────────────────────────────────────────────────────────────────────┐
+ * │ El endpoint definitivo vive en la PLATAFORMA (app.veqto.ai): los leads   │
+ * │ deben caer en la vista de Leads que usa operación, no en una base        │
+ * │ paralela de la landing. Este archivo solo existe para poder desarrollar  │
+ * │ y probar los formularios sin depender de la plataforma.                  │
+ * │                                                                          │
+ * │ NUNCA corre en producción: el guard de abajo devuelve 404 si             │
+ * │ NODE_ENV === 'production'. En producción el cliente apunta a             │
+ * │ NEXT_PUBLIC_LANDING_LEADS_BASE_URL y esta ruta no se usa.                │
+ * │                                                                          │
+ * │ NO TOCA LA BASE DE DATOS. Guarda en memoria del proceso y se vacía en    │
+ * │ cada reinicio. La landing no configura DATABASE_URL ni aplica            │
+ * │ migraciones: el almacenamiento real es responsabilidad de la plataforma. │
+ * └─────────────────────────────────────────────────────────────────────────┘
  *
- * Un solo endpoint con discriminador `tipo` en vez de tres rutas: la
- * idempotencia, el límite de tasa, el captcha y la auditoría son idénticos para
- * los tres formularios, y así se implementan una vez. Internamente despacha a
- * `solicitudes` (simulador y crédito) o a `aliados`.
- *
- * El contrato vive en `src/lib/landing-leads/contract.ts` y lo comparten este
- * archivo y el cliente de la landing, así que no pueden desalinearse.
- *
- * Orden de las comprobaciones (importa): origen → cuerpo → límite de tasa →
- * validación → captcha → idempotencia → escritura. El captcha se verifica
- * después de validar para no gastar una llamada a Cloudflare en un payload que
- * ya venía roto.
+ * Implementa el contrato completo (`docs/CONTRATO-LANDING-LEADS.md`) para que lo
+ * que se pruebe aquí sea lo que la plataforma tiene que replicar: validación por
+ * campo, 422/429/403, idempotencia con replay y referencias con el formato real.
  */
 
-import { eq } from 'drizzle-orm';
-import { db } from '@/db';
-import { solicitudes, aliados, landingLeadsIdempotencia } from '@/db/schema';
 import {
   IDEMPOTENCY_HEADER,
   type LandingLeadError,
@@ -31,18 +32,17 @@ import { validarLead, leerCaptchaToken } from '@/lib/landing-leads/validate';
 import { verificarTurnstile } from '@/lib/landing-leads/turnstile';
 import { consumirIntento } from '@/lib/landing-leads/rate-limit';
 import { referenciaCredito, codigoAliado } from '@/lib/landing-leads/reference';
-import {
-  filaSimulador,
-  filaCredito,
-  filaAliado,
-  type ContextoPeticion,
-} from '@/lib/landing-leads/persist';
 
-/** Recibe PII: nunca se cachea ni se prerenderiza. */
 export const dynamic = 'force-dynamic';
 
 const MAX_CUERPO_BYTES = 256 * 1024;
-const INTENTOS_REFERENCIA = 3;
+
+/**
+ * Leads aceptados en esta sesión de desarrollo. En memoria y con tope, para que
+ * un bucle accidental durante las pruebas no haga crecer el proceso sin límite.
+ */
+const idempotencia = new Map<string, { tipo: LeadTipo; referencia: string }>();
+const MAX_CLAVES = 1_000;
 
 function error(
   status: number,
@@ -54,47 +54,30 @@ function error(
   return Response.json(cuerpo, { status });
 }
 
+function respuestaOk(tipo: LeadTipo, referencia: string, duplicado: boolean): Response {
+  const cuerpo: LandingLeadOk = {
+    ok: true,
+    tipo,
+    referencia,
+    recibidoEn: new Date().toISOString(),
+    duplicado,
+  };
+  return Response.json(cuerpo, { status: duplicado ? 200 : 201 });
+}
+
 function ipDe(request: Request): string | null {
   const forwarded = request.headers.get('x-forwarded-for');
   if (forwarded) return forwarded.split(',')[0].trim();
   return request.headers.get('x-real-ip');
 }
 
-/**
- * Orígenes permitidos. La landing y el endpoint comparten dominio, así que en
- * producción no hay CORS de por medio; esto solo cierra la puerta a que otro
- * sitio publique el formulario contra nuestra API desde el navegador.
- *
- * Una petición sin cabecera `Origin` (curl, QA, server-to-server) se acepta: el
- * endpoint es público y sin sesión, así que no hay nada que robar por CSRF. La
- * defensa contra abuso es el captcha y el límite de tasa, no el origen.
- */
-function origenPermitido(request: Request): boolean {
-  const origin = request.headers.get('origin');
-  if (!origin) return true;
-
-  const configurados = (process.env.LANDING_LEADS_ALLOWED_ORIGINS ?? '')
-    .split(',')
-    .map((o) => o.trim())
-    .filter(Boolean);
-
-  const permitidos = new Set(
-    configurados.length > 0
-      ? configurados
-      : [
-          process.env.NEXT_PUBLIC_APP_URL ?? 'https://veqto.ai',
-          'https://veqto.ai',
-          'https://www.veqto.ai',
-          'http://localhost:3000',
-        ]
-  );
-
-  return permitidos.has(origin);
-}
-
 export async function POST(request: Request): Promise<Response> {
-  if (!origenPermitido(request)) {
-    return error(403, 'ORIGEN_NO_PERMITIDO', 'Origen no autorizado para este endpoint.');
+  // ─── GUARD: este mock no existe en producción ───────────────────────────
+  // Se comprueba antes que nada. Si alguien despliega la landing sin apuntar el
+  // cliente a la plataforma, el formulario falla de forma visible en vez de
+  // aceptar leads que nadie va a ver.
+  if (process.env.NODE_ENV === 'production') {
+    return new Response(null, { status: 404 });
   }
 
   const contentLength = Number(request.headers.get('content-length') ?? 0);
@@ -130,109 +113,23 @@ export async function POST(request: Request): Promise<Response> {
     return error(403, 'CAPTCHA_INVALIDO', captcha.motivo);
   }
 
-  const claveIdempotencia = request.headers.get(IDEMPOTENCY_HEADER)?.trim() || null;
-  const ctx: ContextoPeticion = { ip, userAgent: request.headers.get('user-agent') };
+  const clave = request.headers.get(IDEMPOTENCY_HEADER)?.trim() || null;
 
-  try {
-    // Envío ya procesado con esta clave: se repite la respuesta original.
-    if (claveIdempotencia) {
-      const previo = await db
-        .select()
-        .from(landingLeadsIdempotencia)
-        .where(eq(landingLeadsIdempotencia.clave, claveIdempotencia))
-        .limit(1);
-
-      if (previo.length > 0) {
-        return respuestaOk(previo[0].tipo as LeadTipo, previo[0].referencia, true);
-      }
-    }
-
-    return await crearLead(lead, claveIdempotencia, ctx);
-  } catch (e) {
-    // El detalle va al log del servidor, nunca al cliente: el payload lleva PII.
-    console.error('[landing-leads] fallo al registrar la solicitud', e);
-    return error(500, 'ERROR_INTERNO', 'No pudimos registrar tu solicitud. Intenta de nuevo.');
-  }
-}
-
-function respuestaOk(tipo: LeadTipo, referencia: string, duplicado: boolean): Response {
-  const cuerpo: LandingLeadOk = {
-    ok: true,
-    tipo,
-    referencia,
-    recibidoEn: new Date().toISOString(),
-    duplicado,
-  };
-  return Response.json(cuerpo, { status: duplicado ? 200 : 201 });
-}
-
-/**
- * Reserva la clave de idempotencia y escribe la fila.
- *
- * El insert en `landing_leads_idempotencia` es lo que resuelve la carrera entre
- * dos peticiones simultáneas con la misma clave: la PK deja pasar solo a una.
- * Si perdemos la carrera, devolvemos la referencia de quien ganó en vez de crear
- * una segunda solicitud.
- */
-async function crearLead(
-  lead: Exclude<ReturnType<typeof validarLead>, { valido: false }>['datos'],
-  clave: string | null,
-  ctx: ContextoPeticion
-): Promise<Response> {
-  let ultimoError: unknown = null;
-
-  for (let intento = 0; intento < INTENTOS_REFERENCIA; intento++) {
-    const referencia = lead.tipo === 'aliado' ? codigoAliado() : referenciaCredito();
-
-    if (clave) {
-      const reservada = await db
-        .insert(landingLeadsIdempotencia)
-        .values({ clave, tipo: lead.tipo, referencia })
-        .onConflictDoNothing()
-        .returning();
-
-      if (reservada.length === 0) {
-        // Otra petición con la misma clave se nos adelantó.
-        const ganador = await db
-          .select()
-          .from(landingLeadsIdempotencia)
-          .where(eq(landingLeadsIdempotencia.clave, clave))
-          .limit(1);
-
-        if (ganador.length > 0) {
-          return respuestaOk(ganador[0].tipo as LeadTipo, ganador[0].referencia, true);
-        }
-      }
-    }
-
-    try {
-      if (lead.tipo === 'aliado') {
-        await db.insert(aliados).values(filaAliado(lead, referencia, ctx));
-      } else if (lead.tipo === 'credito') {
-        await db.insert(solicitudes).values(filaCredito(lead, referencia, ctx));
-      } else {
-        await db.insert(solicitudes).values(filaSimulador(lead, referencia, ctx));
-      }
-
-      return respuestaOk(lead.tipo, referencia, false);
-    } catch (e) {
-      ultimoError = e;
-
-      // La reserva quedó huérfana: se libera para que un reintento del titular
-      // no choque con su propia clave y quede bloqueado para siempre.
-      if (clave) {
-        await db
-          .delete(landingLeadsIdempotencia)
-          .where(eq(landingLeadsIdempotencia.clave, clave))
-          .catch(() => {});
-      }
-
-      // Colisión de referencia: se reintenta con otra. Cualquier otro fallo se
-      // propaga al catch del handler.
-      const mensaje = e instanceof Error ? e.message : String(e);
-      if (!/unique|duplicate/i.test(mensaje)) throw e;
-    }
+  if (clave) {
+    const previo = idempotencia.get(clave);
+    if (previo) return respuestaOk(previo.tipo, previo.referencia, true);
   }
 
-  throw ultimoError ?? new Error('No se pudo generar una referencia única');
+  const referencia = lead.tipo === 'aliado' ? codigoAliado() : referenciaCredito();
+
+  if (clave) {
+    if (idempotencia.size >= MAX_CLAVES) idempotencia.clear();
+    idempotencia.set(clave, { tipo: lead.tipo, referencia });
+  }
+
+  console.info(
+    `[landing-leads:mock] ${lead.tipo} aceptado → ${referencia} (no persistido: el almacenamiento real es de la plataforma)`
+  );
+
+  return respuestaOk(lead.tipo, referencia, false);
 }

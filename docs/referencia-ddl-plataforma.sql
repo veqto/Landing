@@ -1,14 +1,19 @@
--- LANDING-LEADS — cambios de base para POST /api/landing-leads
+-- REFERENCIA — NO APLICAR DESDE ESTE REPO
 --
--- El proyecto nunca ha versionado migraciones: el schema se aplicaba con
--- `npm run db:push`. `drizzle-kit generate` sobre un repo sin historial produce
--- un baseline que recrea las 6 tablas, y eso falla contra una base que ya
--- existe. Así que este es el delta explícito, escrito a mano.
+-- DDL que se escribió cuando el endpoint LANDING-LEADS iba a vivir en la
+-- landing. La arquitectura cambió: el endpoint lo implementa la PLATAFORMA
+-- (app.veqto.ai) y los leads caen en la vista de Leads de operación.
 --
--- Es idempotente: se puede correr dos veces sin romper nada.
+-- Este archivo NO se aplica a ninguna base:
+--   · La landing no configura DATABASE_URL.
+--   · npm run db:push / db:generate / db:seed / db:studio estan BLOQUEADOS.
 --
--- Aplicar con:  psql "$DATABASE_URL" -f db/migrations/001_landing_leads.sql
--- Alternativa:  npm run db:push   (compara schema y aplica el mismo delta)
+-- Se conserva solo como referencia para quien implemente el endpoint en la
+-- plataforma: muestra el modelo de idempotencia (clave -> referencia, con la
+-- clave como PRIMARY KEY para resolver envios simultaneos) y el campo jsonb
+-- donde caben los datos del lead que no tienen columna propia.
+--
+-- Contrato completo: docs/CONTRATO-LANDING-LEADS.md
 
 BEGIN;
 
