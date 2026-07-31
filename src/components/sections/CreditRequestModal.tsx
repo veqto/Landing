@@ -2,10 +2,15 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { useModal } from '@/components/ModalContext';
 import { useTranslation } from '@/i18n/LanguageContext';
 import { cn } from '@/lib/utils';
+import {
+  submitCreditApplication,
+  newIdempotencyKey,
+  type CreditApplicationFailure,
+} from '@/lib/credit-application-api';
 
 const STEPS = 3;
 
@@ -14,9 +19,56 @@ const incomeRanges = ['< $1.5M', '$1.5M - $3M', '$3M - $5M', '$5M - $10M', '> $1
 const vehicleTypes = ['Carro nuevo', 'Carro usado', 'Moto', 'Vehículo comercial'];
 const vehicleTypesEn = ['New car', 'Used car', 'Motorcycle', 'Commercial vehicle'];
 
-function generateRef() {
-  const num = Math.floor(10000 + Math.random() * 90000);
-  return `REF-2026-${num}`;
+/**
+ * Texto de la autorización de tratamiento de datos (Ley 1581 de 2012).
+ *
+ * El texto en español es literal y está aprobado legalmente: no editar sin el
+ * visto bueno correspondiente. Se parte en dos porque "Política de Tratamiento
+ * de Datos" es un enlace a /autorizacion-datos.
+ */
+const CONSENT_TEXT = {
+  es: {
+    before:
+      'Autorizo a Veqto S.A.S., como responsable del tratamiento, a recolectar y tratar los datos personales que suministro en este formulario con la finalidad de estudiar mi solicitud de crédito vehicular, contactarme por teléfono, WhatsApp o correo electrónico, y compartirlos con las entidades financieras aliadas para la evaluación del crédito, conforme a la Ley 1581 de 2012 y a la ',
+    link: 'Política de Tratamiento de Datos',
+    after: '.',
+  },
+  en: {
+    before:
+      'I authorize Veqto S.A.S., as data controller, to collect and process the personal data I provide in this form for the purpose of assessing my vehicle credit application, contacting me by phone, WhatsApp or email, and sharing it with allied financial institutions for the credit evaluation, in accordance with Law 1581 of 2012 and the ',
+    link: 'Personal Data Processing Policy',
+    after: '.',
+  },
+} as const;
+
+/** Mensaje al titular según por qué falló el envío. */
+function errorMessage(failure: CreditApplicationFailure, es: boolean): string {
+  switch (failure.kind) {
+    case 'not_configured':
+      return es
+        ? 'El envío de solicitudes no está disponible en este momento. Escríbenos y te ayudamos a completar tu solicitud.'
+        : 'Application submission is unavailable right now. Contact us and we will help you complete your application.';
+    case 'validation':
+      return es
+        ? 'Algunos datos no pasaron la validación. Revisa la información e inténtalo de nuevo.'
+        : 'Some of your details did not pass validation. Please review them and try again.';
+    case 'rate_limited':
+      return es
+        ? 'Recibimos demasiadas solicitudes desde aquí. Espera un momento y vuelve a intentarlo.'
+        : 'Too many requests from here. Please wait a moment and try again.';
+    case 'forbidden':
+      return es
+        ? 'No pudimos verificar que eres una persona. Vuelve a intentarlo.'
+        : 'We could not verify you are human. Please try again.';
+    case 'network':
+      return es
+        ? 'No pudimos conectar con la plataforma. Revisa tu conexión e inténtalo de nuevo.'
+        : 'We could not reach the platform. Check your connection and try again.';
+    default:
+      return es
+        ? 'Algo falló al enviar tu solicitud. Inténtalo de nuevo en unos minutos.'
+        : 'Something went wrong sending your application. Please try again in a few minutes.';
+  }
 }
 
 const CreditRequestModal: React.FC = () => {
@@ -25,8 +77,15 @@ const CreditRequestModal: React.FC = () => {
   const isOpen = activeModal === 'credit';
 
   const [step, setStep] = useState(1);
-  const [submitted, setSubmitted] = useState(false);
-  const [refCode, setRefCode] = useState('');
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [failure, setFailure] = useState<CreditApplicationFailure | null>(null);
+  /** Referencia emitida por la plataforma. Nunca se genera localmente. */
+  const [refCode, setRefCode] = useState<string | null>(null);
+  /**
+   * Se mantiene entre reintentos del mismo envío para que un timeout seguido de
+   * "Reintentar" no cree dos solicitudes.
+   */
+  const [idempotencyKey, setIdempotencyKey] = useState<string | null>(null);
 
   // Step 1
   const [fullName, setFullName] = useState('');
@@ -44,13 +103,16 @@ const CreditRequestModal: React.FC = () => {
   const [income, setIncome] = useState('');
   const [employment, setEmployment] = useState<'empleado' | 'independiente' | ''>('');
   const [creditHistory, setCreditHistory] = useState('');
-  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [aceptaTratamientoDatos, setAceptaTratamientoDatos] = useState(false);
 
   const es = locale === 'es';
 
   const resetForm = () => {
     setStep(1);
-    setSubmitted(false);
+    setStatus('idle');
+    setFailure(null);
+    setRefCode(null);
+    setIdempotencyKey(null);
     setFullName('');
     setCedula('');
     setPhone('');
@@ -62,10 +124,12 @@ const CreditRequestModal: React.FC = () => {
     setIncome('');
     setEmployment('');
     setCreditHistory('');
-    setAcceptTerms(false);
+    setAceptaTratamientoDatos(false);
   };
 
   const handleClose = () => {
+    // Cerrar a mitad de un envío dejaría la solicitud en el aire: se ignora.
+    if (status === 'submitting') return;
     closeModal();
     setTimeout(resetForm, 300);
   };
@@ -73,13 +137,53 @@ const CreditRequestModal: React.FC = () => {
   const canAdvance = () => {
     if (step === 1) return fullName && cedula.length >= 6 && phone.length >= 10 && email.includes('@');
     if (step === 2) return vehicleType !== '';
-    if (step === 3) return income && employment && creditHistory && acceptTerms;
+    if (step === 3) return Boolean(income && employment && creditHistory && aceptaTratamientoDatos);
     return false;
   };
 
-  const handleSubmit = () => {
-    setRefCode(generateRef());
-    setSubmitted(true);
+  const handleSubmit = async () => {
+    if (!canAdvance() || status === 'submitting') return;
+
+    // Un reintento conserva la clave del primer intento; un envío nuevo la crea.
+    const key = idempotencyKey ?? newIdempotencyKey();
+    if (key !== idempotencyKey) setIdempotencyKey(key);
+
+    setStatus('submitting');
+    setFailure(null);
+
+    const result = await submitCreditApplication(
+      {
+        nombreCompleto: fullName.trim(),
+        cedula,
+        celular: phone,
+        correo: email.trim(),
+        tipoVehiculo: vehicleType,
+        valorVehiculo: vehicleValue,
+        cuotaInicialPorcentaje: downPayment,
+        plazoMeses: plazo,
+        rangoIngresos: income,
+        tipoEmpleo: employment as 'empleado' | 'independiente',
+        historialCrediticio: creditHistory as 'si' | 'no' | 'no_se',
+        aceptaTratamientoDatos: true,
+        locale,
+      },
+      { idempotencyKey: key }
+    );
+
+    if (result.ok) {
+      // Único camino al modal de éxito: 2xx de la plataforma.
+      setRefCode(result.referencia);
+      setStatus('success');
+      return;
+    }
+
+    // La clave solo se conserva cuando no sabemos si la solicitud llegó a
+    // registrarse (red/timeout, 5xx). Un 422 no creó nada: el siguiente envío,
+    // ya con los datos corregidos, va como solicitud nueva.
+    if (!result.retryable) setIdempotencyKey(null);
+
+    setFailure(result);
+    setStatus('idle');
   };
 
   const formatCOP = (v: number) =>
@@ -126,15 +230,16 @@ const CreditRequestModal: React.FC = () => {
                 </h2>
                 <button
                   onClick={handleClose}
-                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                  aria-label="Cerrar"
+                  disabled={status === 'submitting'}
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  aria-label={es ? 'Cerrar' : 'Close'}
                 >
                   <X size={20} className="text-gray-500" />
                 </button>
               </div>
 
               {/* Progress bar */}
-              {!submitted && (
+              {status !== 'success' && (
                 <div className="flex gap-2">
                   {Array.from({ length: STEPS }, (_, i) => (
                     <div
@@ -151,8 +256,8 @@ const CreditRequestModal: React.FC = () => {
 
             {/* Body */}
             <div className="px-6 py-6">
-              {submitted ? (
-                /* Success State */
+              {status === 'success' ? (
+                /* Success State — solo se llega aquí con un 2xx de la plataforma */
                 <motion.div
                   className="flex flex-col items-center text-center py-8"
                   initial={{ scale: 0.8, opacity: 0 }}
@@ -175,10 +280,13 @@ const CreditRequestModal: React.FC = () => {
                       ? 'Nuestro equipo analizará tu perfil con IA y te contactaremos en menos de 24 horas con las mejores opciones de crédito de múltiples bancos.'
                       : 'Our team will analyze your profile with AI and contact you within 24 hours with the best credit options from multiple banks.'}
                   </p>
-                  <p className="text-sm text-gray-400 mb-8">
-                    {es ? 'Referencia' : 'Reference'}: <span className="font-mono font-bold text-aurora">{refCode}</span>
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-3 w-full">
+                  {/* La plataforma puede confirmar sin referencia: no se inventa una. */}
+                  {refCode && (
+                    <p className="text-sm text-gray-400 mb-8">
+                      {es ? 'Referencia' : 'Reference'}: <span className="font-mono font-bold text-aurora">{refCode}</span>
+                    </p>
+                  )}
+                  <div className={cn('flex flex-col sm:flex-row gap-3 w-full', !refCode && 'mt-4')}>
                     <button
                       onClick={handleClose}
                       className="flex-1 py-3 px-6 rounded-xl bg-aurora text-white font-semibold hover:bg-aurora/90 transition-colors"
@@ -427,15 +535,24 @@ const CreditRequestModal: React.FC = () => {
                         <label className="flex items-start gap-3 cursor-pointer mt-4">
                           <input
                             type="checkbox"
-                            checked={acceptTerms}
-                            onChange={(e) => setAcceptTerms(e.target.checked)}
-                            className="mt-1 w-4 h-4 text-aurora rounded border-gray-300 focus:ring-aurora"
+                            checked={aceptaTratamientoDatos}
+                            onChange={(e) => setAceptaTratamientoDatos(e.target.checked)}
+                            disabled={status === 'submitting'}
+                            className="mt-1 w-4 h-4 shrink-0 text-aurora rounded border-gray-300 accent-aurora focus:ring-aurora"
                           />
-                          <span className="text-xs text-gray-600">
-                            {es
-                              ? 'Autorizo el tratamiento de mis datos personales según la política de privacidad'
-                              : 'I authorize the processing of my personal data according to the privacy policy'}
-                            *
+                          <span className="text-xs text-gray-600 leading-relaxed">
+                            {CONSENT_TEXT[es ? 'es' : 'en'].before}
+                            <a
+                              href="/autorizacion-datos"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-aurora underline hover:text-aurora/80"
+                            >
+                              {CONSENT_TEXT[es ? 'es' : 'en'].link}
+                            </a>
+                            {CONSENT_TEXT[es ? 'es' : 'en'].after}
+                            <span className="text-coral ml-0.5">*</span>
                           </span>
                         </label>
                       </div>
@@ -446,47 +563,70 @@ const CreditRequestModal: React.FC = () => {
             </div>
 
             {/* Footer buttons */}
-            {!submitted && (
-              <div className="sticky bottom-0 bg-white border-t border-gray-100 px-6 py-4 flex justify-between gap-3">
-                {step > 1 ? (
-                  <button
-                    onClick={() => setStep(step - 1)}
-                    className="flex items-center gap-1 py-3 px-5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
+            {status !== 'success' && (
+              <div className="sticky bottom-0 bg-white border-t border-gray-100 px-6 py-4">
+                {/* Error del último intento de envío */}
+                {failure && (
+                  <div
+                    role="alert"
+                    className="flex items-start gap-2 mb-3 p-3 rounded-xl bg-red-50 border border-red-100"
                   >
-                    <ChevronLeft size={16} />
-                    {es ? 'Atrás' : 'Back'}
-                  </button>
-                ) : (
-                  <div />
+                    <AlertCircle size={16} className="text-red-500 mt-0.5 shrink-0" />
+                    <p className="text-xs text-red-700 leading-relaxed">
+                      {errorMessage(failure, es)}
+                    </p>
+                  </div>
                 )}
-                {step < STEPS ? (
-                  <button
-                    onClick={() => canAdvance() && setStep(step + 1)}
-                    disabled={!canAdvance()}
-                    className={cn(
-                      'flex items-center gap-1 py-3 px-6 rounded-xl text-sm font-semibold transition-all',
-                      canAdvance()
-                        ? 'bg-aurora text-white hover:bg-aurora/90 shadow-lg shadow-aurora/30'
-                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    )}
-                  >
-                    {es ? 'Siguiente' : 'Next'}
-                    <ChevronRight size={16} />
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => canAdvance() && handleSubmit()}
-                    disabled={!canAdvance()}
-                    className={cn(
-                      'py-3 px-6 rounded-xl text-sm font-semibold transition-all',
-                      canAdvance()
-                        ? 'bg-aurora text-white hover:bg-aurora/90 shadow-lg shadow-aurora/30'
-                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    )}
-                  >
-                    {es ? 'Enviar Solicitud' : 'Submit Application'}
-                  </button>
-                )}
+
+                <div className="flex justify-between gap-3">
+                  {step > 1 ? (
+                    <button
+                      onClick={() => setStep(step - 1)}
+                      disabled={status === 'submitting'}
+                      className="flex items-center gap-1 py-3 px-5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <ChevronLeft size={16} />
+                      {es ? 'Atrás' : 'Back'}
+                    </button>
+                  ) : (
+                    <div />
+                  )}
+                  {step < STEPS ? (
+                    <button
+                      onClick={() => canAdvance() && setStep(step + 1)}
+                      disabled={!canAdvance()}
+                      className={cn(
+                        'flex items-center gap-1 py-3 px-6 rounded-xl text-sm font-semibold transition-all',
+                        canAdvance()
+                          ? 'bg-aurora text-white hover:bg-aurora/90 shadow-lg shadow-aurora/30'
+                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      )}
+                    >
+                      {es ? 'Siguiente' : 'Next'}
+                      <ChevronRight size={16} />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleSubmit}
+                      disabled={!canAdvance() || status === 'submitting'}
+                      className={cn(
+                        'flex items-center gap-2 py-3 px-6 rounded-xl text-sm font-semibold transition-all',
+                        canAdvance() && status !== 'submitting'
+                          ? 'bg-aurora text-white hover:bg-aurora/90 shadow-lg shadow-aurora/30'
+                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      )}
+                    >
+                      {status === 'submitting' && (
+                        <Loader2 size={16} className="animate-spin" />
+                      )}
+                      {status === 'submitting'
+                        ? (es ? 'Enviando…' : 'Sending…')
+                        : failure?.retryable
+                          ? (es ? 'Reintentar' : 'Retry')
+                          : (es ? 'Enviar Solicitud' : 'Submit Application')}
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </motion.div>
