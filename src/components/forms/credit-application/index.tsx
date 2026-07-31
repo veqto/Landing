@@ -2,8 +2,14 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Check } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { useTranslation } from '@/i18n/LanguageContext';
+import {
+  submitCreditoLead,
+  newIdempotencyKey,
+  type LeadFailure,
+} from '@/lib/landing-leads/client';
+import { leadErrorMessage, aplanarFieldErrors } from '@/lib/landing-leads/messages';
 import Container from '@/components/ui/Container';
 import StepIndicator from '@/components/forms/StepIndicator';
 import CreditStep1Vehicle from './CreditStep1Vehicle';
@@ -82,8 +88,15 @@ const CreditApplicationForm: React.FC = () => {
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState(1);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [refNumber, setRefNumber] = useState('');
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [failure, setFailure] = useState<LeadFailure | null>(null);
+  /** Referencia emitida por la plataforma. Nunca se genera localmente. */
+  const [refNumber, setRefNumber] = useState<string | null>(null);
+  /**
+   * Se conserva entre reintentos del mismo envío para que un timeout seguido de
+   * "Reintentar" no cree dos solicitudes.
+   */
+  const [idempotencyKey, setIdempotencyKey] = useState<string | null>(null);
 
   const [step1, setStep1] = useState<Step1Data>(initialStep1);
   const [step2, setStep2] = useState<Step2Data>(initialStep2);
@@ -124,22 +137,101 @@ const CreditApplicationForm: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (status === 'submitting') return;
     if (!validateCurrentStep()) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    // Generate deterministic ref
-    const ts = Date.now().toString(36).toUpperCase().slice(-5);
-    const ref = `VEQ-2026-${ts}`;
-    setRefNumber(ref);
-    setIsSubmitted(true);
+
+    const key = idempotencyKey ?? newIdempotencyKey();
+    if (key !== idempotencyKey) setIdempotencyKey(key);
+
+    setStatus('submitting');
+    setFailure(null);
+
+    const result = await submitCreditoLead(
+      {
+        vehiculo: {
+          tipoSolicitud: step1.tipoSolicitud,
+          estadoVehiculo: step1.estadoVehiculo,
+          tipoVehiculo: step1.tipoVehiculo,
+          claseVehiculo: step1.claseVehiculo,
+          marca: step1.marca,
+          linea: step1.linea,
+          modelo: step1.modelo,
+          valorVehiculo: step1.valorVehiculo,
+          cuotaInicial: step1.cuotaInicial,
+          plazoDeseado: step1.plazoDeseado,
+          codigoAliado: step1.codigoAliado || undefined,
+        },
+        personal: { ...step2 },
+        residencia: {
+          direccionResidencia: step3.direccionResidencia,
+          departamentoResidencia: step3.departamentoResidencia,
+          ciudadResidencia: step3.ciudadResidencia,
+          barrio: step3.barrio,
+          estrato: step3.estrato,
+          tiempoResidencia: step3.tiempoResidencia,
+          celular: step3.celular,
+          telefonoResidencia: step3.telefonoResidencia,
+          correoElectronico: step3.correoElectronico,
+          tipoVivienda: step3.tipoVivienda,
+        },
+        financiera: { ...step4 },
+        activos: {
+          inmuebles: step5.inmuebles,
+          vehiculos: step5.vehiculos,
+          referencias: step5.referencias,
+          declaraRenta: step5.declaraRenta,
+          esPEP: step5.esPEP,
+          manejaRecursosPublicos: step5.manejaRecursosPublicos,
+          tienePoderPublico: step5.tienePoderPublico,
+          origenFondos: step5.origenFondos,
+          origenCliente: step5.origenCliente,
+        },
+        consentimientos: {
+          // validateStep6 ya exige autorizaDatos, así que aquí es siempre true.
+          aceptaTratamientoDatos: true,
+          autorizaCentrales: step6.autorizaCentrales,
+          autorizaContacto: step6.autorizaContacto,
+          autorizaComercial: step6.autorizaComercial,
+          aceptaTerminos: step6.aceptaTerminos,
+          declaraVeracidad: step6.declaraVeracidad,
+          autorizaFirmaElectronica: step6.autorizaFirmaElectronica,
+          firmaDigital: step6.firmaDigital,
+          ciudadSolicitud: step6.ciudadSolicitud,
+        },
+        locale,
+      },
+      { idempotencyKey: key }
+    );
+
+    if (result.ok) {
+      // Único camino a la pantalla de éxito: 2xx de la plataforma.
+      setRefNumber(result.referencia);
+      setStatus('success');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Un 422 no creó nada: el siguiente envío va como solicitud nueva. Solo se
+    // conserva la clave cuando no sabemos si llegó a registrarse.
+    if (!result.retryable) setIdempotencyKey(null);
+
+    // El backend puede rechazar campos que la validación local dejó pasar.
+    if (result.kind === 'validation') {
+      setErrors(aplanarFieldErrors(result.fieldErrors));
+    }
+
+    setFailure(result);
+    setStatus('idle');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const labels = stepLabels[locale] ?? stepLabels.es;
 
-  if (isSubmitted) {
+  if (status === 'success') {
     return (
       <Container className="py-12">
         <div className="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
@@ -191,34 +283,61 @@ const CreditApplicationForm: React.FC = () => {
           </div>
 
           {/* Footer buttons */}
-          <div className="sticky bottom-0 bg-white border-t border-gray-100 px-6 md:px-8 py-4 flex gap-3">
-            {step > 1 && (
-              <button
-                onClick={handleBack}
-                className="flex items-center gap-1.5 px-5 py-3 rounded-xl border-2 border-gray-200 text-negro font-semibold text-sm hover:bg-gray-50 transition-colors"
+          <div className="sticky bottom-0 bg-white border-t border-gray-100 px-6 md:px-8 py-4">
+            {failure && (
+              <div
+                role="alert"
+                className="flex items-start gap-2 mb-3 p-3 rounded-xl bg-red-50 border border-red-100"
               >
-                <ArrowLeft size={16} />
-                {locale === 'es' ? 'Atrás' : 'Back'}
-              </button>
+                <AlertCircle size={16} className="text-red-500 mt-0.5 shrink-0" />
+                <p className="text-xs text-red-700 leading-relaxed">
+                  {leadErrorMessage(failure, locale === 'es')}
+                </p>
+              </div>
             )}
 
-            {step < TOTAL_STEPS ? (
-              <button
-                onClick={handleNext}
-                className="flex-1 flex items-center justify-center gap-1.5 px-5 py-3 rounded-xl bg-aurora text-white font-semibold text-sm hover:bg-aurora-dark transition-colors"
-              >
-                {locale === 'es' ? 'Siguiente' : 'Next'}
-                <ArrowRight size={16} />
-              </button>
-            ) : (
-              <button
-                onClick={handleSubmit}
-                className="flex-1 flex items-center justify-center gap-1.5 px-5 py-3 rounded-xl bg-aurora text-white font-semibold text-sm hover:bg-aurora-dark transition-colors"
-              >
-                {locale === 'es' ? 'Enviar Solicitud' : 'Submit Application'}
-                <Check size={16} />
-              </button>
-            )}
+            <div className="flex gap-3">
+              {step > 1 && (
+                <button
+                  onClick={handleBack}
+                  disabled={status === 'submitting'}
+                  className="flex items-center gap-1.5 px-5 py-3 rounded-xl border-2 border-gray-200 text-negro font-semibold text-sm hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ArrowLeft size={16} />
+                  {locale === 'es' ? 'Atrás' : 'Back'}
+                </button>
+              )}
+
+              {step < TOTAL_STEPS ? (
+                <button
+                  onClick={handleNext}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-5 py-3 rounded-xl bg-aurora text-white font-semibold text-sm hover:bg-aurora-dark transition-colors"
+                >
+                  {locale === 'es' ? 'Siguiente' : 'Next'}
+                  <ArrowRight size={16} />
+                </button>
+              ) : (
+                <button
+                  onClick={handleSubmit}
+                  disabled={status === 'submitting'}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-5 py-3 rounded-xl bg-aurora text-white font-semibold text-sm hover:bg-aurora-dark transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {status === 'submitting' ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      {locale === 'es' ? 'Enviando…' : 'Sending…'}
+                    </>
+                  ) : (
+                    <>
+                      {failure?.retryable
+                        ? (locale === 'es' ? 'Reintentar' : 'Retry')
+                        : (locale === 'es' ? 'Enviar Solicitud' : 'Submit Application')}
+                      <Check size={16} />
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

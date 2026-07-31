@@ -7,10 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push",
-    "db:seed": "tsx src/db/seed-bancos.ts",
-    "db:studio": "drizzle-kit studio"
+    "db:generate": "node -e \"console.error('BLOQUEADO: este repo no versiona el schema. El almacenamiento de leads es de la plataforma (app.veqto.ai). Ver docs/CONTRATO-LANDING-LEADS.md');process.exit(1)\"",
+    "db:push": "node -e \"console.error('BLOQUEADO: prohibido aplicar schema desde la landing contra cualquier base. El almacenamiento de leads es de la plataforma (app.veqto.ai). Ver docs/CONTRATO-LANDING-LEADS.md');process.exit(1)\"",
+    "db:seed": "node -e \"console.error('BLOQUEADO: escribe en la base. Correr desde la plataforma, no desde la landing.');process.exit(1)\"",
+    "db:studio": "node -e \"console.error('BLOQUEADO: abre conexion a la base. Usar las herramientas de la plataforma.');process.exit(1)\""
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

@@ -7,7 +7,8 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/i18n/LanguageContext';
 
 interface Props {
-  refNumber: string;
+  /** Referencia devuelta por la plataforma. `null` si el 2xx no la trajo. */
+  refNumber: string | null;
 }
 
 const CreditSuccess: React.FC<Props> = ({ refNumber }) => {
@@ -45,12 +46,15 @@ const CreditSuccess: React.FC<Props> = ({ refNumber }) => {
           : 'Our team will analyze your profile with AI and contact you within 24 hours with the best credit options from multiple banks.'}
       </p>
 
-      <div className="bg-gray-50 rounded-xl px-6 py-3 mb-8">
-        <span className="text-xs text-gray-500">
-          {locale === 'es' ? 'Número de referencia' : 'Reference number'}
-        </span>
-        <p className="text-xl font-bold text-aurora">{refNumber}</p>
-      </div>
+      {/* La plataforma puede confirmar sin referencia: no se inventa una. */}
+      {refNumber && (
+        <div className="bg-gray-50 rounded-xl px-6 py-3 mb-8">
+          <span className="text-xs text-gray-500">
+            {locale === 'es' ? 'Número de referencia' : 'Reference number'}
+          </span>
+          <p className="text-xl font-bold text-aurora">{refNumber}</p>
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
         <button
